@@ -6,7 +6,7 @@
 // 20150510
 // minimum cut
 // Tseng Wei-Hsung
-//  
+//
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +19,7 @@
 #include "../lib/tm_usage.h"
 
 using namespace std;
+int system(const char *command);
 int help_message(void);
 int main(int argc, char * argv[]){
 
@@ -30,6 +31,11 @@ int main(int argc, char * argv[]){
 		cout << "Number of argument is out of range!!" << endl;
 		return help_message();
 	}
+	// time
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
+	printf("now: %d-%d-%d %d:%d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
 	int size;
 	double cut_off,capacity;
 	fstream fin(argv[2]);
@@ -97,12 +103,43 @@ int main(int argc, char * argv[]){
 		cout << "Use brute force algorithms: run out all of the combination = 2^N \n";
 		bruteforceST(input, output, s->id, t->id);
 	}
+	else if ((strcmp(argv[1],"--plot-network") == 0)) {
+		cout << " input the cut off you want ";
+		cout << "[default = cut off in input file]:" << endl;
+		if (cin.peek() != '\n') { // check if next character is newline
+			cin >> cut_off;
+		}
+		input.sortNode();
+		fstream fout;
+		fout.open("graph.dot",ios::out);
+		// cout << "fout.is_open(): " << fout.is_open(); // print the file check
+		if (fout.is_open()){
+			fout << "//" << "Graph by dimsplendid" << endl;
+			fout << "//" << tm.tm_year + 1900 << tm.tm_mon + 1 << \
+			 tm.tm_mday << tm.tm_hour << tm.tm_min << endl;
+			fout << "digraph " << "Network" << "{" << endl;
+			vector<Edge*>::iterator itN;
+			vector<Edge *> edges = input.edges;
+			for ( itN = edges.begin() ; itN != edges.end() ; itN++ ){
+				Edge *edge = (*itN);
+				Node *u = edge->s;
+				Node *v = edge->t;
+				if( edge->_capacity > cut_off){
+					fout << "\"" << u->label << "\" -> \"" << v->label << "\"";
+					fout << "[ label = " << edge->_capacity << " ]" << endl;
+				}
+			}
+			fout << "}" << endl;
+			fout.close();
+		}
+		system("dot -Tpng graph.dot -o graph.png");
+	}
 	//calc time and memory
 	tmusg.getPeriodUsage(stat);
 	cout << "The total CPU time: " << (stat.uTime + stat.sTime)/1000.0;
 	cout << "ms" << endl;
 	cout << "memory: " << stat.vmPeak << "KB" << endl; // print peak memory
-	return 0;   
+	return 0;
 }
 
 int help_message()
@@ -117,7 +154,7 @@ int help_message()
 	cout << "OPTIONS " << endl;
 	cout << "       -g file [s flow], --generator" << endl;
 	cout << "           Generating a matrix name <file name>.data, which " << endl;
-	cout << "           has s flow=[s flow], by default s flow is 2.5." << endl;        
+	cout << "           has s flow=[s flow], by default s flow is 2.5." << endl;
 	cout << endl;
 	cout << "       -f file, --FordFulkerson " << endl;
 	cout << "           Use the Ford Fulkerson algorithms to solve the min" << endl;
