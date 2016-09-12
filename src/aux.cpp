@@ -217,37 +217,56 @@ struct descending_cmp{
 } descending;
 
 void FF_output(Graph & input, Graph & output,double flow, int & s, int & t, Graph & s_group, Graph & t_group){
-	fstream fout,tree_out;
+	fstream fout,tree_out,tree_nrm_out;
 	string filename;
-	string tree_log_name = "Tree.log";
+	string tree_log_name = "Tree.dot";
+  string tree_nrm_name = "Tree_nrm.dot";
 	filename = input._name;
 	filename += "_FF";
 	std::vector<int> tmp_container;
 
 	fout.open(filename.c_str(),ios::out);
 	tree_out.open(tree_log_name.c_str(),ios::app);
+  //tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
 
-    output.cal_neighbors(0);
-    vector<int> s_cluster=BFS_alg(output,s);
-    sort(s_cluster.begin(),s_cluster.end(),descending);
+  output.cal_neighbors(0);
+  vector<int> s_cluster=BFS_alg(output,s);
+  sort(s_cluster.begin(),s_cluster.end(),descending);
 	Node * sorce = output.getNodeById(s);
+  //if (input.nodes.size() < 4){
 	tree_out << "\"";
-	for (int i = 0; i < input.nodes.size(); i++)
-	{
-		tree_out << input.nodes[i]->label << " ";
-	}
-	tree_out << "\" -- \"";
-
+	 for (int i = 0; i < input.nodes.size(); i++){
+		  tree_out << input.nodes[i]->label << " ";
+	 }
+	 tree_out << "\" -> \"";
+  //}
+  /*
+  else{
+    tree_out << "C" << input.id;
+    tree_out << "#";
+    for (int i = 0; i < input.nodes.size(); i++){
+      tree_out << input.nodes[i]->label << " ";
+    }
+    tree_out << endl;
+  }*/
 	fout << "By Ford Fulkerson algorithms, S cluster is: " << sorce->label;
 	fout << " " ;
 	tree_out << sorce->label << " ";
-    for(int i = 0; i < s_cluster.size();i++)
-    {
+/*  if (s_cluster.size() >= 4){
+    tree_out << "C" << s_group.id << "\"";
+    tree_out << "#";
+  }*/
+  for(int i = 0; i < s_cluster.size();i++) {
 		Node * node = output.getNodeById(s_cluster[i]);
 		fout << node->label << " ";
-		tree_out << node->label << " ";
+    //if ( s_cluster.size() < 4 )
+		  tree_out << node->label << " ";
 	}
-	tree_out << "\"[ label = " << flow << "];\n";
+  /*if (s_cluster.size() < 4)
+    tree_out << "\"";
+  else
+    tree_out << endl;*/
+
 	s_cluster.push_back(sorce->id);
 
 	for(int i = 0; i < s_cluster.size();i++)
@@ -269,30 +288,30 @@ void FF_output(Graph & input, Graph & output,double flow, int & s, int & t, Grap
 	}
 	s_group.outputFormatFile();
 	s_group.sortNode();
-    fout << endl;
+  fout << endl;
 	fout << endl;
-    output.cal_neighbors(1);
-    vector<int> t_cluster=BFS_alg(output,t);
-    sort(t_cluster.begin(),t_cluster.end(),descending);
+  output.cal_neighbors(1);
+  vector<int> t_cluster=BFS_alg(output,t);
+  sort(t_cluster.begin(),t_cluster.end(),descending);
 	Node * sink = output.getNodeById(t);
+  tree_out << "\"[ label = \"" << flow/double(s_cluster.size())/double(t_cluster.size()+1) << "\"];\n";
 	tree_out << "\"";
 	for (int i = 0; i < input.nodes.size(); i++){
 		tree_out << input.nodes[i]->label << " ";
 	}
-	tree_out << "\" -- \"";
+	tree_out << "\" -> \"";
 
 	fout << "By Ford Fulkerson algorithms, T cluster is: " << sink->label;
 	fout << " " ;
-	
-    for(int i = 0; i < t_cluster.size();i++)
-    {
+
+  for(int i = 0; i < t_cluster.size();i++){
 		Node * node = output.getNodeById(t_cluster[i]);
 		fout << node->label << " ";
 		tree_out << node->label << " ";
 	}
 	tree_out << sink->label << " ";
-	tree_out << "\"\n";
-    fout << endl;
+	tree_out << "\";\n";
+  fout << endl;
 	t_cluster.push_back(sink->id);
 	for(int i = 0; i < t_cluster.size();i++)
 	{
@@ -346,7 +365,7 @@ bool findPath(Graph& graph,vector<int> & path,int& s,int& t)
         pre_node->color = 0;//gray
 //		cout << "pre node: " << pre_node->label << endl;;
         // build OutLinks
-        vector<Edge*> OutLinks; 
+        vector<Edge*> OutLinks;
         for (int i = 0; i < pre_node->next_nodes.size(); ++i)
         {
             Node * next = graph.getNodeById(pre_node->next_nodes[i]);
@@ -426,21 +445,21 @@ int st_iteration(Graph & input)
 		cout << "Target: " << t->label << " " << t->site_energy << endl;
 		string t_name, s_name, output_name;
 
-		t_name = input._name + "_t";
-		s_name = input._name + "_s";
+		t_name = input._name + "t";
+		s_name = input._name + "s";
 		output_name = input._name + "_FF";
 
 		Graph output =  Graph(output_name.c_str());
 		Graph s_group = Graph(s_name.c_str());
 		Graph t_group = Graph(t_name.c_str());
-		
+
 		flow = FordFulkerson(input,output,s->id,t->id,s_group,t_group);
 
 		cout << "Flow = " << flow << endl;
 		FF_output(input, output, flow,s->id, t->id, s_group, t_group);
 		st_iteration(s_group);
 		st_iteration(t_group);
-		
+
 	}
 	else{
 		Node * leaf = (*input.nodes.begin());
@@ -471,10 +490,10 @@ int st_iteration_modified(Graph & input, double pre_flow)
 		Graph output =  Graph(output_name.c_str());
 		Graph s_group = Graph(s_name.c_str());
 		Graph t_group = Graph(t_name.c_str());
-		
+
 		flow = FordFulkerson(input,output,s->id,t->id,s_group,t_group);
 		cout << "pre_flow = " << pre_flow << "\n flow = " << flow << " \n ";
-		
+
 		while (flow < pre_flow && (t->id != s->id) ){
 			i++;
 			Node * t = (*(input.nodes.end()-i));
@@ -488,7 +507,7 @@ int st_iteration_modified(Graph & input, double pre_flow)
 		FF_output(input, output, flow, s->id, t->id, s_group, t_group);
 		st_iteration_modified(s_group,pre_flow);
 		st_iteration_modified(t_group,pre_flow);
-		
+
 	}
 	else{
 		Node * leaf = (*input.nodes.begin());
@@ -529,7 +548,7 @@ double bruteforceST(Graph& input, Graph& output,int& s, int& t,Graph & s_group, 
 			tmp_flw = 0;
 			vector<int> elem = combination[j];
 			if(find(elem.begin(),elem.end(),s) != elem.end())
-			{	
+			{
 				if(find(elem.begin(),elem.end(),t) != elem.end())
 					continue;	// do nothing
 				else

@@ -71,9 +71,25 @@ int main(int argc, char * argv[]){
 	}
 	input.outputFormatFile();
 	if((strcmp(argv[1],"-t") == 0)){
+		fstream tree_out, tree_nrm_out;
+		//static int cluster_index = 0;
+		string tree_log_name = "Tree.dot";
+		string tree_nrm_name = "Tree_nrm.dot";
+		tree_out.open(tree_log_name.c_str(),ios::app);
+		tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
+		tree_out << "digraph Network{" << endl;
+		tree_nrm_out << "digraph Network{" << endl;
+		tree_out.close();
+		tree_nrm_out.close();
 		cout << "Start to built st cut..." << endl;
 		input.sortNode();
 		st_iteration(input);
+		tree_out.open(tree_log_name.c_str(),ios::app);
+		tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
+		tree_out << "}" << endl;
+		tree_nrm_out << "}" << endl;
+		tree_out.close();
+		tree_nrm_out.close();
 	}
 	else if((strcmp(argv[1],"-f") == 0)){
 		int S,T;
@@ -124,7 +140,7 @@ int main(int argc, char * argv[]){
 				Edge *edge = (*itN);
 				Node *u = edge->s;
 				Node *v = edge->t;
-				if( edge->_capacity > cut_off){
+			if( edge->_capacity > cut_off){
 					fout << "\"" << u->label << "\" -> \"" << v->label << "\"";
 					fout << "[ label = " << edge->_capacity << " ]" << endl;
 				}
@@ -144,36 +160,6 @@ int main(int argc, char * argv[]){
 
 int help_message()
 {
-	cout << "NAME " << endl;
-	cout << "       MinCut - tool to cut the graph" << endl;
-	cout << "SYNOPSIS" << endl;
-	cout << "       ./bin/MinCut [-g file] [-f|-b|-d file] [-h]" << endl;
-	cout << "DESCRIPTION " << endl;
-	cout << "       MinCut is a tool to analysis graph, and especially"<< endl;
-	cout << "       for photosynthesis system." << endl;
-	cout << "OPTIONS " << endl;
-	cout << "       -g file [s flow], --generator" << endl;
-	cout << "           Generating a matrix name <file name>.data, which " << endl;
-	cout << "           has s flow=[s flow], by default s flow is 2.5." << endl;
-	cout << endl;
-	cout << "       -f file, --FordFulkerson " << endl;
-	cout << "           Use the Ford Fulkerson algorithms to solve the min" << endl;
-	cout << "           -cut problem. This function would produce 2 file, " << endl;
-	cout << "           file.log and file.out." << endl;
-	cout << endl;
-	cout << "       -b file, --BruteForce " << endl;
-	cout << "           Use the brute force ethod to check the s-t cut of" << endl;
-	cout << "           the graph. Because the minimum cut is the NPC " << endl;
-	cout << "           problem, this method can't check the large system" << endl;
-	cout << "           It's use to check the smaller system(maybe < 10)." << endl;
-	cout << endl;
-	cout << "       -d file, --DFS " << endl;
-	cout << "           Use the Depth-first Search to build the DFS forest." <<endl;
-	cout << endl;
-	cout << "       -t file, --BinaryTree " << endl;
-	cout << "           Use Ford Fulkerson algorithms to build the Tree. " << endl;
-	cout << endl;
-	cout << "       -h, --help" << endl;
-	cout << "           Print a help message and exit" << endl;
+	system("cat doc/usage");
 	return 0;
 }

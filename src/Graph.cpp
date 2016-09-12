@@ -28,7 +28,7 @@ Node::Node(string str)
 	prev = 0;
 	label = str;
 }
-Node::Node(const int& i) 
+Node::Node(const int& i)
 {
 	// cout << "construct node "<< i ;
 	// cout << " ..." << endl;
@@ -47,6 +47,8 @@ Graph::Graph(const string& n)
 }
 void Graph::init()
 {
+	id = Graph_id;
+	Graph_id +1;
 	vector<Node*>::iterator itN;
 	for ( itN = nodes.begin() ; itN != nodes.end() ; itN++ )
 	{
@@ -166,13 +168,13 @@ void Graph::cal_neighbors(int option){
 		for(itN = nodes.begin();itN != nodes.end();itN++){
 			Node * node = (*itN);
 			node->neighbors = node->pre_nodes;
-		}		
+		}
 	}
 }
 
 void Graph::read(char* file_name)
 {
-	
+
 }
 void Graph::build_st(double & s_capacity,double & t_capacity)
 {
@@ -213,7 +215,7 @@ void sortEdge(vector<Edge*> & edges){
 }
 void Graph::sortEdge(){
 	sort(edges.begin(),edges.end(),myEdge);
-}	
+}
 void Graph::sortNode(){
 	sort(nodes.begin(),nodes.end(),myNode);
 }

@@ -17,7 +17,9 @@
 #include <ctime>
 
 #define DOUBLE_INF std::numeric_limits<double>::max()
-#define DIS_INF 2147483647 
+#define DIS_INF 2147483647
+static int Graph_id = 0;
+
 using namespace std;
 class Node{
 	public:
@@ -25,7 +27,7 @@ class Node{
 		Node(string );
 		int id;
 		string label;
-			
+
 		int color;
 		//use for dfs
 		int d;
@@ -52,10 +54,11 @@ class Graph{
 	public:
 		Graph(const string& n);
 		~Graph();
-		
+		int id;
+
 		void addNode(const int& id,string name);
 		void addEdge(const int& v1, const int& v2,double& flow);
-		
+
 		Node * getNodeById(const int& id);
 		Edge * getEdgeById(const int&, const int&);
 
@@ -74,7 +77,7 @@ class Graph{
 		double cutoff;
 		map<int, Node *> nodesMap;
 		map<int,map<int,Edge *> > edgesMap;
-        vector<Node *> nodes;
+    vector<Node *> nodes;
 		vector<Edge *> edges;
 		string _name;
 };
