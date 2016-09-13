@@ -1,18 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "Graph.h"
-#include "aux.h"
 #include "generator.h"
-#include "ST_tree.h"
-
-#include "../lib/tm_usage.h"
 
 double fRand(double fMin, double fMax)
-{	
+{
 	srand(static_cast<unsigned>(rand()));
-	double f = fMin + static_cast<double>(rand())/(static_cast<double>(RAND_MAX/(fMax-fMin))); 
+	double f = fMin + static_cast<double>(rand())/(static_cast<double>(RAND_MAX/(fMax-fMin)));
 	return f;
 }
 void generator(int size,string file_name,double s_flow)

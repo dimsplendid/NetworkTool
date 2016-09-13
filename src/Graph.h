@@ -1,6 +1,11 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+//some c function, should be modified
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <algorithm>
 #include <vector>
 #include <map>
@@ -15,6 +20,12 @@
 //for rand function
 #include <cstdlib>
 #include <ctime>
+#include "aux.h"
+
+#include "generator.h"
+#include "ST_tree.h"
+
+#include "../lib/tm_usage.h"
 
 #define DOUBLE_INF std::numeric_limits<double>::max()
 #define DIS_INF 2147483647

@@ -1,18 +1,12 @@
-// 2016 01 05
-// version 1.01
-// simplier code and add some funcion
-// - can set S and T directily
-//
-// 20150510
-// minimum cut
+// 2016 09 15
 // Tseng Wei-Hsung
-//
+// use git to make log
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "Graph.h"
-#include "aux.h"
+#include "tool.h"
 #include "generator.h"
 #include "ST_tree.h"
 
@@ -45,14 +39,12 @@ int main(int argc, char * argv[]){
 	Graph input = Graph(argv[3]);
 	cout << "size: " << size << endl;
 	cout << "cut off: " << cut_off << endl;
-	for(int i = 0; i < size; i++)
-	{
+	for(int i = 0; i < size; i++) {
 		fin >> name[i];
 		cout << name[i] << "\t";
 	}
 	cout  << endl;
-	for(int i = 0; i < size; i++)
-	{
+	for(int i = 0; i < size; i++) {
 		fin >> site_energy[i];
 		input.addNode(i,name[i]);
 		input.nodes[i]->site_energy = site_energy[i];
@@ -71,8 +63,7 @@ int main(int argc, char * argv[]){
 	}
 	input.outputFormatFile();
 	if((strcmp(argv[1],"-t") == 0)){
-		fstream tree_out, tree_nrm_out;
-		//static int cluster_index = 0;
+		fstream tree_out, tree_nrm_out; // log file
 		string tree_log_name = "Tree.dot";
 		string tree_nrm_name = "Tree_nrm.dot";
 		tree_out.open(tree_log_name.c_str(),ios::app);
@@ -81,9 +72,12 @@ int main(int argc, char * argv[]){
 		tree_nrm_out << "digraph Network{" << endl;
 		tree_out.close();
 		tree_nrm_out.close();
+
 		cout << "Start to built st cut..." << endl;
-		input.sortNode();
+
+		input.id = 0;
 		st_iteration(input);
+
 		tree_out.open(tree_log_name.c_str(),ios::app);
 		tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
 		tree_out << "}" << endl;
@@ -132,7 +126,7 @@ int main(int argc, char * argv[]){
 		if (fout.is_open()){
 			fout << "//" << "Graph by dimsplendid" << endl;
 			fout << "//" << tm.tm_year + 1900 << tm.tm_mon + 1 << \
-			 tm.tm_mday << tm.tm_hour << tm.tm_min << endl;
+			tm.tm_mday << tm.tm_hour << tm.tm_min << endl;
 			fout << "digraph " << "Network" << "{" << endl;
 			vector<Edge*>::iterator itN;
 			vector<Edge *> edges = input.edges;
@@ -140,7 +134,7 @@ int main(int argc, char * argv[]){
 				Edge *edge = (*itN);
 				Node *u = edge->s;
 				Node *v = edge->t;
-			if( edge->_capacity > cut_off){
+				if( edge->_capacity > cut_off) {
 					fout << "\"" << u->label << "\" -> \"" << v->label << "\"";
 					fout << "[ label = " << edge->_capacity << " ]" << endl;
 				}
@@ -158,8 +152,7 @@ int main(int argc, char * argv[]){
 	return 0;
 }
 
-int help_message()
-{
+int help_message() {
 	system("cat doc/usage");
 	return 0;
 }

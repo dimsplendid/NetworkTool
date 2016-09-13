@@ -9,7 +9,7 @@ ARFLAGS = rcv
 # -O2 option is for optimized version
 OPTFLAGS = -O3
 DBGFLAGS = -g -D_DEBUG_ON_
-OBJECTS = main.o Graph.o aux.o generator.o bruteforce.o
+OBJECTS = main.o Graph.o aux.o generator.o bruteforce.o tool.o
 
 all	: bin/MinCut
 	@echo -n ""
@@ -28,8 +28,10 @@ generator.o	: src/generator.cpp src/generator.h
 			$(CC) $(CFLAGS) $< -o $@
 bruteforce.o: src/bruteforce.cpp
 			$(CC) $(CFLAGS) $< -o $@
+tool.o: src/tool.cpp src/tool.h
+			$(CC) $(CFLAGS) $< -o $@
 
-# debug 
+# debug option
 #bin/min_cut_dbg	: Graph_dbg.o main_dbg.o Min_cut_dbg.o
 #			$(CC) $(OPTFLAGS) $(DBGFLAGS) Graph_dbg.o Min_cut_dbg.o main_dbg.o -lgsl -lgslcblas -lm -o $@
 #main_dbg.o 	   	: src/main.cpp
@@ -49,4 +51,3 @@ tm_usage.o: lib/tm_usage.cpp lib/tm_usage.h
 
 clean:
 		rm -rf *.o lib/*.a lib/*.o bin/*
-

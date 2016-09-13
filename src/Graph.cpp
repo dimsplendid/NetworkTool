@@ -1,15 +1,6 @@
 // Tseng Wei-Hsiang
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "Graph.h"
-#include "aux.h"
-#include "generator.h"
-#include "ST_tree.h"
-
-#include "../lib/tm_usage.h"
+#include "tool.h"
 
 Edge::Edge(Node *a, Node *b,double & capacity)
 {
@@ -197,18 +188,14 @@ void Graph::build_st(double & s_capacity,double & t_capacity)
 	nodes.push_back(t);
 }
 // compare operator
-struct myEdgeCmp
-{
-	bool operator() (Edge* i, Edge* j){
-		return (i->_capacity > j->_capacity);
-	}
-}myEdge;
-struct myNodeCmp
-{
-	bool operator() (Node *i, Node *j){
-		return (i->site_energy > j->site_energy);
-	}
-}myNode;
+struct myEdgeCmp{
+	bool operator() (Edge* i, Edge* j)
+	{	return (i->_capacity > j->_capacity);}
+}myEdge; // sort edge by the rate
+struct myNodeCmp{
+	bool operator() (Node *i, Node *j)
+	{	return (i->site_energy > j->site_energy);}
+}myNode; // sort node by nodes' energy(exciton energy)
 
 void sortEdge(vector<Edge*> & edges){
 	sort(edges.begin(),edges.end(),myEdge);
@@ -280,11 +267,9 @@ void Graph::outputFormatFile(string option){
 		Edge *edge = (*itN);
 		Node *u = edge->s;
 		Node *v = edge->t;
-		if ( edge->_capacity > cutoff) // cut off
-		{
+		if ( edge->_capacity > cutoff) {
 			// use for DFS search, need modifying...
-			if (strcmp(option.c_str(),"DFS") == 0)
-			{
+			if (strcmp(option.c_str(),"DFS") == 0){
 				cout << "v" << u->id << "_" << u->d << "/" << u->f;
 				cout << " -> " ;
 				cout << "v" << v->id << "_" << v->d << "/" << u->f;
@@ -295,22 +280,19 @@ void Graph::outputFormatFile(string option){
 			cout << " [label =\" " << edge->_capacity << " \"]";
 			cout << ";" << endl;
 		}
-
 	}
 	cout << "}" << endl;
 }
 
 // Still Some Problem...
 
-Tree::Tree(int & rank)
-{
+Tree::Tree(int & rank) {
 	string name = "level "+my_itos(rank);
 	level = rank;
 	cluster.clear();
 	network = new Graph(name);
 }
-Tree::~Tree()
-{
+Tree::~Tree() {
 	delete network;
 	delete s_sub;
 	delete t_sub;
@@ -319,13 +301,11 @@ Tree::~Tree()
 	t_sub = 0;
 }
 
-void Tree::build_tree()
-{
+void Tree::build_tree() {
 	// copy temp graph
 	Graph tmp_G = Graph("temp");
 	vector<Edge*>::iterator itE;
-	for(itE = network->edges.begin();itE != network->edges.end();itE++)
-	{
+	for(itE = network->edges.begin();itE != network->edges.end();itE++) {
 		Edge * edge = (*itE);
 		tmp_G.addEdge(edge->s->id,edge->t->id,edge->_capacity);
 	}
@@ -336,6 +316,7 @@ void Tree::build_tree()
 	tmp_G.build_st(s_cap,t_cap);
 	cout << "build tree.." << endl;
 	vector<Node*>::iterator itN;
+
 	for(itN = tmp_G.nodes.begin(); itN != tmp_G.nodes.end(); itN++)
 		cluster.push_back((*itN)->id);
 
@@ -349,16 +330,13 @@ void Tree::build_tree()
 	cout << endl;
 	if(s_cluster.size() == 1)
 		cout << "It's the leaf" << endl;
-	else
-	{
+	else {
 		s_sub = new Tree(next_level);
 		Graph * G_s = s_sub->network;
 		cout << "build G_s..." << endl;
-		for(int i = 0; i < s_cluster.size();i++)
-		{
+		for(int i = 0; i < s_cluster.size();i++) {
 			int id1 = s_cluster[i];
-			for(int j = 0; j < s_cluster.size(); j++)
-			{
+			for(int j = 0; j < s_cluster.size(); j++) {
 				int id2 = s_cluster[j];
 				Edge * edge = tmp_G.getEdgeById(id1,id2);
 				G_s->addEdge(id1,id2,edge->_capacity);
@@ -380,16 +358,13 @@ void Tree::build_tree()
 		cout << s_cluster[i] << " ";
 	if(t_cluster.size() == 1)
 		cout << "It's the leaf" << endl;
-	else
-	{
+	else {
 		t_sub = new Tree(next_level);
 		Graph * G_t = t_sub->network;
 		cout << "build G_t..." << endl;
-		for(int i = 0; i < t_cluster.size();i++)
-		{
+		for(int i = 0; i < t_cluster.size();i++) {
 			int id1 = t_cluster[i];
-			for(int j = 0; j < t_cluster.size(); j++)
-			{
+			for(int j = 0; j < t_cluster.size(); j++) {
 				int id2 = t_cluster[j];
 				Edge * edge = tmp_G.getEdgeById(id1,id2);
 				G_t->addEdge(id1,id2,edge->_capacity);
