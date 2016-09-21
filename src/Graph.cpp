@@ -2,8 +2,7 @@
 #include "Graph.h"
 #include "tool.h"
 
-Edge::Edge(Node *a, Node *b,double & capacity)
-{
+Edge::Edge(Node *a, Node *b,double & capacity){
 	// 	cout << "construct edge "<< a->id << " -> ";
 	// 	cout << b->id << " ..." << endl;
 	s = a;
@@ -11,16 +10,14 @@ Edge::Edge(Node *a, Node *b,double & capacity)
 	_capacity = capacity;
 	_flow = 0;
 }
-Node::Node(string str)
-{
+Node::Node(string str){
 	id = -1;
 	color = -1;
 	d = DIS_INF;
 	prev = 0;
 	label = str;
 }
-Node::Node(const int& i)
-{
+Node::Node(const int& i){
 	// cout << "construct node "<< i ;
 	// cout << " ..." << endl;
 	id = i;
@@ -30,61 +27,50 @@ Node::Node(const int& i)
 	label =  my_itos(i);
 }
 
-Graph::Graph(const string& n)
-{
+Graph::Graph(const string& n){
 	//	cout << "construct graph " << n << " ..." << endl;
 	_name = n;
-	cutoff = 1.0e-15;
+	cutoff = 1.0e-15; // 0 in double
 }
-void Graph::init()
-{
+void Graph::init(){
 	id = Graph_id;
 	Graph_id +1;
 	vector<Node*>::iterator itN;
-	for ( itN = nodes.begin() ; itN != nodes.end() ; itN++ )
-	{
+	for ( itN = nodes.begin() ; itN != nodes.end() ; itN++ ){
 		Node *node = (*itN);
 		node->d = DIS_INF;
 		node->prev = 0;
 		node->color = -1;
 	}
-
 }
-Graph::~Graph()
-{
+Graph::~Graph(){
 	//	cout << "destruct graph " << _name << " ..." << endl;
 	vector<Edge *>::iterator itE;
-	for ( itE = edges.begin() ; itE != edges.end() ; itE++ )
-	{
+	for ( itE = edges.begin() ; itE != edges.end() ; itE++ ){
 		delete (*itE);
 		(*itE) = 0;
 	}
 
 	map<int, Node *>::iterator itN;
-	for ( itN = nodesMap.begin() ; itN != nodesMap.end() ; itN++ )
-	{
+	for ( itN = nodesMap.begin() ; itN != nodesMap.end() ; itN++ ){
 		delete (*itN).second;
 		(*itN).second = 0;
 	}
 
 	vector<Node *>::iterator itN2;
-	for ( itN2 = nodes.begin() ; itN2 != nodes.end() ; itN2++ )
-	{
+	for ( itN2 = nodes.begin() ; itN2 != nodes.end() ; itN2++ ){
 		(*itN2) = 0;
 	}
 }
 
-void Graph::addNode(const int& id,string name)
-{
+void Graph::addNode(const int& id,string name){
 	Node *n;
 	map<int, Node *>::iterator it = nodesMap.find(id);
-	if (it != nodesMap.end())
-	{
+	if (it != nodesMap.end()){
 		n = (*it).second;
 		cout << "E: This id is duplicate!!" << endl;
 	}
-	else
-	{
+	else{
 		n = new Node(id);
 		nodesMap[id] = n;
 		nodes.push_back(n);
@@ -92,30 +78,29 @@ void Graph::addNode(const int& id,string name)
 	}
 }
 
-void Graph::addEdge(const int& v1, const int& v2, double & capacity)
-{
+void Graph::addEdge(const int& v1, const int& v2, double & capacity){
 	Node *a, *b;
 	map<int, Node *>::iterator it = nodesMap.find(v1);
 	if ( it != nodesMap.end() )
 		a = (*it).second;
-	else
-	{
+	else{
 		a = new Node(v1);
 		nodesMap[v1] = a;
 		nodes.push_back(a);
 	}
 
 	it = nodesMap.find(v2);
-	if ( it != nodesMap.end() )
+	if ( it != nodesMap.end() ){
 		b = (*it).second;
-	else
-	{
+	}
+	else{
 		b = new Node(v2);
 		nodesMap[v2] = b;
 		nodes.push_back(b);
 	}
-	if (capacity <= cutoff)
+	if (capacity <= cutoff){
 		capacity = 0;
+	}
 	Edge *e = new Edge(a, b, capacity);
 	edges.push_back(e);
 	edgesMap[v1][v2]=e;
@@ -124,8 +109,7 @@ void Graph::addEdge(const int& v1, const int& v2, double & capacity)
 void Graph::build_network(){
 	// init
 	vector<Node*>::iterator itN;
-	for(itN = nodes.begin(); itN != nodes.end();itN++)
-	{
+	for(itN = nodes.begin(); itN != nodes.end();itN++){
 		Node * node = (*itN);
 		node->pre_nodes.clear();
 		node->next_nodes.clear();
@@ -133,12 +117,10 @@ void Graph::build_network(){
 	// cal
 	sortEdge();
 	vector<Edge*>::iterator itE;
-	for(itE = edges.begin();itE != edges.end();itE++)
-	{
+	for(itE = edges.begin();itE != edges.end();itE++){
 		Node * s = (*itE)->s;
 		Node * t = (*itE)->t;
-		if((*itE)->_capacity > cutoff)
-		{
+		if((*itE)->_capacity > cutoff){
 			s->next_nodes.push_back(t->id);
 			t->pre_nodes.push_back(s->id);
 		}
@@ -163,19 +145,13 @@ void Graph::cal_neighbors(int option){
 	}
 }
 
-void Graph::read(char* file_name)
-{
-
-}
-void Graph::build_st(double & s_capacity,double & t_capacity)
-{
+void Graph::build_st(double & s_capacity,double & t_capacity) {
 	Node * s = new Node(-1);
 	Node * t = new Node(-2);
 	s->label = "s";
 	t->label = "t";
 	vector<Node*>::iterator itN;
-	for(itN = nodes.begin();itN != nodes.end();itN++)
-	{
+	for(itN = nodes.begin();itN != nodes.end();itN++){
 		Node * node = (*itN);
 		Edge * edge_s = new Edge(s,node,s_capacity);
 		Edge * edge_t = new Edge(node,t,t_capacity);
@@ -207,8 +183,7 @@ void Graph::sortNode(){
 	sort(nodes.begin(),nodes.end(),myNode);
 }
 
-Node * Graph::getNodeById(const int& id)
-{
+Node * Graph::getNodeById(const int& id){
 	return nodesMap[id];
 }
 
