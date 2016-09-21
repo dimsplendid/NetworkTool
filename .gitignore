@@ -1,0 +1,7 @@
+*.o
+*.c
+*.a
+*.dot
+bin/*
+input/*
+output/*
