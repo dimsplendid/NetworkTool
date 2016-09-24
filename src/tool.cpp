@@ -351,8 +351,11 @@ int st_iteration(Graph & input){
 
 		cout << "Flow = " << flow << endl;
 		FF_output(input, output, flow,s->id, t->id, s_group, t_group);
+		s_group.id = input.id*2 + 1;
+		t_group.id = input.id*2 + 2;
 		st_iteration(s_group);
 		st_iteration(t_group);
+		tree_out(input,s_group,t_group,flow);
 	}
 	else{
 		Node * leaf = (*input.nodes.begin());
@@ -360,6 +363,53 @@ int st_iteration(Graph & input){
 		cout << "Congrajulation!" << endl;
 	}
 	return 0;
+}
+void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow){
+  fstream tout;
+	string root_name, s_name, t_name;
+  tout.open("Tree.dot",ios::app);
+	if(root.nodes.size() > 3){
+		root_name = my_itos(root.id);
+	}
+	else{
+		for (int i = 0; i < root.nodes.size(); i++) {
+			root_name.append(root.nodes[i]->label);
+			root_name.append(" ");
+		}
+	}
+	if(s_group.nodes.size() > 3){
+		s_name = my_itos(s_group.id);
+	}
+	else{
+		for (int i = 0; i < s_group.nodes.size(); i++) {
+			s_name.append(s_group.nodes[i]->label);
+			s_name.append(" ");
+		}
+	}
+	if(t_group.nodes.size() > 3){
+		t_name = my_itos(t_group.id);
+	}
+	else{
+		for (int i = 0; i < t_group.nodes.size(); i++) {
+			t_name.append(t_group.nodes[i]->label);
+			t_name.append(" ");
+		}
+	}
+
+	// graphviz style output
+	tout << "\" " << root_name << "\"" << " -> " ;
+	tout << "\" " << s_name;
+	tout << "\" " << "[dir=\"none\", style=\"dashed\"];" << endl;
+	tout << "\" " << root_name << "\"" << " -> " ;
+	tout << "\" " << t_name;
+	tout << "\" " << "[dir=\"none\", style=\"dashed\"];" << endl;
+	tout << "\" " << s_name << "\"";
+	tout << " -> " ;
+	tout << "\" " << t_name << "\"";
+	tout << "[constraint=\"false\", style=\"bold\", label=\"" << flow << "\"];";
+	tout << endl;
+
+	tout.close();
 }
 
 int st_iteration_modified(Graph & input, double pre_flow){

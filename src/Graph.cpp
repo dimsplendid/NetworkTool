@@ -33,8 +33,7 @@ Graph::Graph(const string& n){
 	cutoff = 1.0e-15; // 0 in double
 }
 void Graph::init(){
-	id = Graph_id;
-	Graph_id +1;
+	id = 0;
 	vector<Node*>::iterator itN;
 	for ( itN = nodes.begin() ; itN != nodes.end() ; itN++ ){
 		Node *node = (*itN);

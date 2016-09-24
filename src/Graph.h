@@ -29,7 +29,6 @@
 
 #define DOUBLE_INF std::numeric_limits<double>::max()
 #define DIS_INF 2147483647
-static int Graph_id = 0;
 
 using namespace std;
 class Node{
@@ -93,8 +92,7 @@ class Graph{
 		string _name;
 };
 
-class Tree
-{
+class Tree{
 public:
 	Tree(int &);
 	~Tree();

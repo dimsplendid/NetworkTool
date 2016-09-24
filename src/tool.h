@@ -14,5 +14,6 @@ void DFS_alg(Graph&,Graph&);
 void DFS_visit(Node*,Graph&,int &);
 int st_iteration(Graph &);
 int st_iteration_modified(Graph &, double);
+void tree_out(Graph & input, Graph & s, Graph & t,double flow);
 
 #endif

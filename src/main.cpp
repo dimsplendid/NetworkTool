@@ -65,13 +65,13 @@ int main(int argc, char * argv[]){
 	if((strcmp(argv[1],"-t") == 0)){
 		fstream tree_out, tree_nrm_out; // log file
 		string tree_log_name = "Tree.dot";
-		string tree_nrm_name = "Tree_nrm.dot";
+		//string tree_nrm_name = "Tree_nrm.dot";
 		tree_out.open(tree_log_name.c_str(),ios::app);
-		tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
+		//tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
 		tree_out << "digraph Network{" << endl;
-		tree_nrm_out << "digraph Network{" << endl;
+		//tree_nrm_out << "digraph Network{" << endl;
 		tree_out.close();
-		tree_nrm_out.close();
+		//tree_nrm_out.close();
 
 		cout << "Start to built st cut..." << endl;
 
@@ -79,11 +79,11 @@ int main(int argc, char * argv[]){
 		st_iteration(input);
 
 		tree_out.open(tree_log_name.c_str(),ios::app);
-		tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
+		//tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
 		tree_out << "}" << endl;
-		tree_nrm_out << "}" << endl;
+		//tree_nrm_out << "}" << endl;
 		tree_out.close();
-		tree_nrm_out.close();
+		//tree_nrm_out.close();
 	}
 	else if((strcmp(argv[1],"-f") == 0)){
 		int S,T;
