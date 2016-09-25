@@ -1,5 +1,6 @@
 // network analysis tool
 #include "tool.h"
+int tree_id = 0;
 struct descending_cmp{
 	bool operator() (int i,int j) {return (i>j);}
 } descending;
@@ -351,11 +352,13 @@ int st_iteration(Graph & input){
 
 		cout << "Flow = " << flow << endl;
 		FF_output(input, output, flow,s->id, t->id, s_group, t_group);
-		s_group.id = input.id*2 + 1;
-		t_group.id = input.id*2 + 2;
+		tree_id++;
+		s_group.id =  tree_id;
+		tree_id++;
+		t_group.id = tree_id;
+		tree_out(input,s_group,t_group,flow);
 		st_iteration(s_group);
 		st_iteration(t_group);
-		tree_out(input,s_group,t_group,flow);
 	}
 	else{
 		Node * leaf = (*input.nodes.begin());
@@ -366,10 +369,18 @@ int st_iteration(Graph & input){
 }
 void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow){
   fstream tout;
+	flow = flow/(double)s_group.nodes.size()/(double)t_group.nodes.size();
 	string root_name, s_name, t_name;
   tout.open("Tree.dot",ios::app);
 	if(root.nodes.size() > 3){
-		root_name = my_itos(root.id);
+		root_name = "C";
+		root_name.append(my_itos(root.id));
+		tout << "\" " << root_name << "\"";
+		tout << "[comment=\"" ;
+		for (int i = 0; i < root.nodes.size(); i++) {
+			tout << root.nodes[i]->label << " ";
+		}
+		tout << "\"];" << endl;
 	}
 	else{
 		for (int i = 0; i < root.nodes.size(); i++) {
@@ -378,7 +389,8 @@ void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow){
 		}
 	}
 	if(s_group.nodes.size() > 3){
-		s_name = my_itos(s_group.id);
+		s_name = "C";
+		s_name.append(my_itos(s_group.id));
 	}
 	else{
 		for (int i = 0; i < s_group.nodes.size(); i++) {
@@ -387,7 +399,8 @@ void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow){
 		}
 	}
 	if(t_group.nodes.size() > 3){
-		t_name = my_itos(t_group.id);
+		t_name = "C";
+		t_name.append(my_itos(t_group.id));
 	}
 	else{
 		for (int i = 0; i < t_group.nodes.size(); i++) {

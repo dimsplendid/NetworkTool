@@ -69,6 +69,11 @@ int main(int argc, char * argv[]){
 		tree_out.open(tree_log_name.c_str(),ios::app);
 		//tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
 		tree_out << "digraph Network{" << endl;
+		tree_out << "edge [comment=\"Wildcard node added automatic in EG.\"];"<< endl;
+    tree_out << "node [comment=\"Wildcard node added automatic in EG.\", "<< endl;
+    tree_out << "      fontname=\"sans-serif\"," << endl;
+    tree_out << "      fontsize=\"16\", " << endl;
+    tree_out << "      penwidth=\"1.5\"];" << endl;
 		//tree_nrm_out << "digraph Network{" << endl;
 		tree_out.close();
 		//tree_nrm_out.close();
