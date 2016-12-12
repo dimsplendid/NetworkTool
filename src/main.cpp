@@ -35,7 +35,7 @@ int main(int argc, char * argv[]){
 	fstream fin(argv[2]);
 	fin >> size >> cut_off;
 	string name[size];
-	int site_energy[size];
+	double site_energy[size];
 	Graph input = Graph(argv[3]);
 	cout << "size: " << size << endl;
 	cout << "cut off: " << cut_off << endl;
@@ -63,6 +63,8 @@ int main(int argc, char * argv[]){
 	}
 	input.outputFormatFile();
 	if((strcmp(argv[1],"-t") == 0)){
+		system("mv Tree.dot Old_tree.dot");
+		system("mv Tree.png Old_tree.png");
 		fstream tree_out, tree_nrm_out; // log file
 		string tree_log_name = "Tree.dot";
 		//string tree_nrm_name = "Tree_nrm.dot";
@@ -89,6 +91,7 @@ int main(int argc, char * argv[]){
 		//tree_nrm_out << "}" << endl;
 		tree_out.close();
 		//tree_nrm_out.close();
+		system("dot -Tpng Tree.dot -o Tree.png");
 	}
 	else if((strcmp(argv[1],"-f") == 0)){
 		int S,T;
