@@ -67,6 +67,7 @@ int main(int argc, char * argv[]){
 		system("mv Tree.png Old_tree.png");
 		fstream tree_out, tree_nrm_out; // log file
 		string tree_log_name = "Tree.dot";
+		tree * root = insertnode();
 		//string tree_nrm_name = "Tree_nrm.dot";
 		tree_out.open(tree_log_name.c_str(),ios::app);
 		//tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
@@ -83,7 +84,8 @@ int main(int argc, char * argv[]){
 		cout << "Start to built st cut..." << endl;
 
 		input.id = 0;
-		st_iteration(input);
+		st_iteration(input,root);
+		tree_printf(root);
 
 		tree_out.open(tree_log_name.c_str(),ios::app);
 		//tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
@@ -92,6 +94,7 @@ int main(int argc, char * argv[]){
 		tree_out.close();
 		//tree_nrm_out.close();
 		system("dot -Tpng Tree.dot -o Tree.png");
+
 	}
 	else if((strcmp(argv[1],"-f") == 0)){
 		int S,T;

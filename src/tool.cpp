@@ -102,7 +102,7 @@ void DFS_visit(Node * u,Graph& graph, int & time){
 
 double FordFulkerson(Graph & input, Graph & output,int & s, int & t,\
 	 										Graph & s_group, Graph & t_group){
-	cout << "copy input to output..." << endl;
+	// cout << "copy input to output..." << endl;
 	double capacity;
 	double flow = 0.0;
 	// copy input to output
@@ -326,10 +326,15 @@ bool findPath(Graph& graph,vector<int> & path,int& s,int& t){
 }
 
 
-int st_iteration(Graph & input){
+int st_iteration(Graph & input, tree * root){
 	double pre_flow = 0.0;
 	double flow = 0.0;
-	cout << "st iterate start..." << endl;
+
+	cout << "st iterate [ "<< root->id << "] start..." << endl;
+	for (int i = 0; i < input.nodes.size(); i++) {
+		root->members[i]=input.nodes.at(i)->id;
+	}
+	root->size=input.nodes.size();
 	if (input.nodes.size() > 1){
 		input.sortNode();
 
@@ -339,6 +344,7 @@ int st_iteration(Graph & input){
 		cout << "Source: " << s->label << " " << s->site_energy << endl;
 		cout << "Target: " << t->label << " " << t->site_energy << endl;
 		string t_name, s_name, output_name;
+		printf("problem?\n");
 
 		t_name = input._name + "t";
 		s_name = input._name + "s";
@@ -347,7 +353,6 @@ int st_iteration(Graph & input){
 		Graph output =	Graph(output_name.c_str());
 		Graph s_group = Graph(s_name.c_str());
 		Graph t_group = Graph(t_name.c_str());
-
 		flow = FordFulkerson(input,output,s->id,t->id,s_group,t_group);
 
 		cout << "Flow = " << flow << endl;
@@ -357,19 +362,32 @@ int st_iteration(Graph & input){
 		tree_id++;
 		t_group.id = tree_id;
 		tree_out(input,s_group,t_group,flow);
-		st_iteration(s_group);
-		st_iteration(t_group);
+		root->max_flw = flow;
+		tree * lt = insertnode();
+		tree * rt = insertnode();
+		root->l_tree = lt;
+	  root->r_tree = rt;
+	  lt->par = root;
+		lt->rank = root->rank + 1;
+		lt->id = s_group.id;
+	  rt->par = root;
+		rt->rank = root->rank + 1;
+		rt->id = t_group.id;
+
+		st_iteration(s_group,lt);
+		st_iteration(t_group,rt);
 	}
 	else{
 		Node * leaf = (*input.nodes.begin());
 		cout << "This is leaf: " << leaf->label << endl;
 		cout << "Congrajulation!" << endl;
 	}
+
 	return 0;
 }
 void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow){
   fstream tout;
-	flow = flow/(double)s_group.nodes.size()/(double)t_group.nodes.size();
+	// flow = flow/(double)s_group.nodes.size()/(double)t_group.nodes.size();
 	string root_name, s_name, t_name;
   tout.open("Tree.dot",ios::app);
 	if(root.nodes.size() > 3){

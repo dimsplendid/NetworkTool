@@ -21,8 +21,6 @@
 #include <cstdlib>
 #include <ctime>
 #include "aux.h"
-
-#include "generator.h"
 #include "ST_tree.h"
 
 #include "../lib/tm_usage.h"
@@ -90,18 +88,6 @@ class Graph{
     vector<Node *> nodes;
 		vector<Edge *> edges;
 		string _name;
-};
-
-class Tree{
-public:
-	Tree(int &);
-	~Tree();
-	vector<int> cluster;
-	int level;
-	Graph *  network;
-	Tree * s_sub;
-	Tree * t_sub;
-	void build_tree();
 };
 
 #endif

@@ -6,7 +6,7 @@
 
 #include "Graph.h"
 #include "aux.h"
-#include "ST_tree.h"
+using namespace std;
 void generator(int, string,double=2.5);
 double fRand(double,double);
 #endif

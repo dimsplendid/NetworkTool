@@ -28,7 +28,7 @@ Node::Node(const int& i){
 }
 
 Graph::Graph(const string& n){
-	//	cout << "construct graph " << n << " ..." << endl;
+	// cout << "construct graph " << n << " ..." << endl;
 	_name = n;
 	cutoff = 1.0e-15; // 0 in double
 }
@@ -43,7 +43,7 @@ void Graph::init(){
 	}
 }
 Graph::~Graph(){
-	//	cout << "destruct graph " << _name << " ..." << endl;
+	// cout << "destruct graph " << _name << " ..." << endl;
 	vector<Edge *>::iterator itE;
 	for ( itE = edges.begin() ; itE != edges.end() ; itE++ ){
 		delete (*itE);
@@ -67,7 +67,7 @@ void Graph::addNode(const int& id,string name){
 	map<int, Node *>::iterator it = nodesMap.find(id);
 	if (it != nodesMap.end()){
 		n = (*it).second;
-		cout << "E: This id is duplicate!!" << endl;
+		// cout << "E: This id is duplicate!!" << endl;
 	}
 	else{
 		n = new Node(id);
@@ -256,95 +256,4 @@ void Graph::outputFormatFile(string option){
 		}
 	}
 	cout << "}" << endl;
-}
-
-// Still Some Problem...
-
-Tree::Tree(int & rank) {
-	string name = "level "+my_itos(rank);
-	level = rank;
-	cluster.clear();
-	network = new Graph(name);
-}
-Tree::~Tree() {
-	delete network;
-	delete s_sub;
-	delete t_sub;
-	network = 0;
-	s_sub = 0;
-	t_sub = 0;
-}
-
-void Tree::build_tree() {
-	// copy temp graph
-	Graph tmp_G = Graph("temp");
-	vector<Edge*>::iterator itE;
-	for(itE = network->edges.begin();itE != network->edges.end();itE++) {
-		Edge * edge = (*itE);
-		tmp_G.addEdge(edge->s->id,edge->t->id,edge->_capacity);
-	}
-	tmp_G.build_network();
-
-	//build st graph
-	double s_cap=0.5, t_cap=0.5;
-	tmp_G.build_st(s_cap,t_cap);
-	cout << "build tree.." << endl;
-	vector<Node*>::iterator itN;
-
-	for(itN = tmp_G.nodes.begin(); itN != tmp_G.nodes.end(); itN++)
-		cluster.push_back((*itN)->id);
-
-	int next_level = level + 1;
-	cout << "S cluster: ";
-	tmp_G.cal_neighbors(0);
-	int s = -1;
-	vector<int> s_cluster=BFS_alg(tmp_G,s);
-	for(int i = 0; i < s_cluster.size();i++)
-		cout << s_cluster[i] << " ";
-	cout << endl;
-	if(s_cluster.size() == 1)
-		cout << "It's the leaf" << endl;
-	else {
-		s_sub = new Tree(next_level);
-		Graph * G_s = s_sub->network;
-		cout << "build G_s..." << endl;
-		for(int i = 0; i < s_cluster.size();i++) {
-			int id1 = s_cluster[i];
-			for(int j = 0; j < s_cluster.size(); j++) {
-				int id2 = s_cluster[j];
-				Edge * edge = tmp_G.getEdgeById(id1,id2);
-				G_s->addEdge(id1,id2,edge->_capacity);
-			}
-		}
-		cout << "calc Tree * s_sub..." << endl;
-		s_sub->build_tree();
-	}
-	cout << "T cluster: ";
-	tmp_G.cal_neighbors(1);
-	int t = -2;
-	vector<int> t_cluster=BFS_alg(tmp_G,t);
-	for(int i = 0; i < t_cluster.size();i++)
-		cout << t_cluster[i] << " ";
-	cout << endl;
-	cout << "build t_sub..." << endl;
-
-	for(int i = 0; i < s_cluster.size();i++)
-		cout << s_cluster[i] << " ";
-	if(t_cluster.size() == 1)
-		cout << "It's the leaf" << endl;
-	else {
-		t_sub = new Tree(next_level);
-		Graph * G_t = t_sub->network;
-		cout << "build G_t..." << endl;
-		for(int i = 0; i < t_cluster.size();i++) {
-			int id1 = t_cluster[i];
-			for(int j = 0; j < t_cluster.size(); j++) {
-				int id2 = t_cluster[j];
-				Edge * edge = tmp_G.getEdgeById(id1,id2);
-				G_t->addEdge(id1,id2,edge->_capacity);
-			}
-		}
-		cout << "calc Tree * t_sub..." << endl;
-		t_sub->build_tree();
-	}
 }

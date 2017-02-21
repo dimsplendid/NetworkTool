@@ -9,7 +9,7 @@ ARFLAGS = rcv
 # -O2 option is for optimized version
 OPTFLAGS = -O3
 DBGFLAGS = -g -D_DEBUG_ON_
-OBJECTS = main.o Graph.o aux.o generator.o bruteforce.o tool.o
+OBJECTS = main.o Graph.o aux.o generator.o bruteforce.o tool.o tree.o
 
 all	: bin/MinCut
 	@echo -n ""
@@ -29,6 +29,8 @@ generator.o	: src/generator.cpp src/generator.h
 bruteforce.o: src/bruteforce.cpp
 			$(CC) $(CFLAGS) $< -o $@
 tool.o: src/tool.cpp src/tool.h
+			$(CC) $(CFLAGS) $< -o $@
+tree.o: src/ST_tree.cpp src/ST_tree.h
 			$(CC) $(CFLAGS) $< -o $@
 
 # debug option
