@@ -31,9 +31,9 @@ int main(int argc, char * argv[]){
 	printf("now: %d-%d-%d %d:%d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
 	int size;
-	double cut_off,capacity;
+	double cut_off,capacity, cluster_cut_off;
 	fstream fin(argv[2]);
-	fin >> size >> cut_off;
+	fin >> size >> cut_off >> cluster_cut_off;
 	string name[size];
 	double site_energy[size];
 	Graph input = Graph(argv[3]);
@@ -86,7 +86,7 @@ int main(int argc, char * argv[]){
 		input.id = 0;
 		st_iteration(input,root);
 		tree_printf(root);
-
+		make_cluster(root,cluster_cut_off);
 		tree_out.open(tree_log_name.c_str(),ios::app);
 		//tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
 		tree_out << "}" << endl;

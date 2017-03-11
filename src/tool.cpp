@@ -488,3 +488,19 @@ int st_iteration_modified(Graph & input, double pre_flow){
 	}
 	return 0;
 }
+
+int make_cluster(tree * root, double cut_off){
+	if((root->max_flw > cut_off) || root->size == 1){
+		printf("---------\n");
+		printf("cluster[%d]: ",root->id);
+		for(int i = 0; i < root->size; i++){
+				printf("%d ",root->members[i]+1); // correct the name, need to modified
+		}
+		printf("\n");
+	}
+	else{
+		make_cluster(root->l_tree,cut_off);
+		make_cluster(root->r_tree,cut_off);
+	}
+	return 0;
+}

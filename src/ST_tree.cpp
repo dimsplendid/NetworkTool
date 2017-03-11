@@ -36,7 +36,9 @@ void tree_printf(tree * root){
     tree_printf(rt);
   }
 }
+int tree_cluster(tree * root){
 
+}
 #ifdef MAIN
 int main(){
   tree * root = insertnode();
