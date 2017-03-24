@@ -39,6 +39,7 @@ int main(int argc, char * argv[]){
 	Graph input = Graph(argv[3]);
 	cout << "size: " << size << endl;
 	cout << "cut off: " << cut_off << endl;
+	cout << "cluster cut off: " << cluster_cut_off << endl;
 	for(int i = 0; i < size; i++) {
 		fin >> name[i];
 		cout << name[i] << "\t";
@@ -95,6 +96,11 @@ int main(int argc, char * argv[]){
 		//tree_nrm_out.close();
 		system("dot -Tpng Tree.dot -o Tree.png");
 
+		//another output for modified tree
+
+		const char * filename = "mTree.dot";
+		tree_printf2file(filename,root);
+		system("dot -Tpng mTree.dot -o mTree.png");
 	}
 	else if((strcmp(argv[1],"-f") == 0)){
 		int S,T;

@@ -326,7 +326,7 @@ bool findPath(Graph& graph,vector<int> & path,int& s,int& t){
 }
 
 
-int st_iteration(Graph & input, tree * root){
+int st_iteration(Graph & input, tree * root) {
 	double pre_flow = 0.0;
 	double flow = 0.0;
 
@@ -385,12 +385,12 @@ int st_iteration(Graph & input, tree * root){
 
 	return 0;
 }
-void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow){
+void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow) {
   fstream tout;
 	// flow = flow/(double)s_group.nodes.size()/(double)t_group.nodes.size();
 	string root_name, s_name, t_name;
   tout.open("Tree.dot",ios::app);
-	if(root.nodes.size() > 3){
+	if(root.nodes.size() > 3) {
 		root_name = "C";
 		root_name.append(my_itos(root.id));
 		tout << "\" " << root_name << "\"";
@@ -406,7 +406,7 @@ void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow){
 			root_name.append(" ");
 		}
 	}
-	if(s_group.nodes.size() > 3){
+	if(s_group.nodes.size() > 3) {
 		s_name = "C";
 		s_name.append(my_itos(s_group.id));
 	}
@@ -416,7 +416,7 @@ void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow){
 			s_name.append(" ");
 		}
 	}
-	if(t_group.nodes.size() > 3){
+	if(t_group.nodes.size() > 3) {
 		t_name = "C";
 		t_name.append(my_itos(t_group.id));
 	}
@@ -443,11 +443,11 @@ void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow){
 	tout.close();
 }
 
-int st_iteration_modified(Graph & input, double pre_flow){
+int st_iteration_modified(Graph & input, double pre_flow) {
 	double flow = 0;
 	int i = 1;
 	// First Cut
-	if (input.nodes.size() > 1){
+	if (input.nodes.size() > 1) {
 		input.sortNode();
 		Node * s = (*input.nodes.begin());
 		Node * t = (*(input.nodes.end()-i));
@@ -481,7 +481,7 @@ int st_iteration_modified(Graph & input, double pre_flow){
 		st_iteration_modified(s_group,pre_flow);
 		st_iteration_modified(t_group,pre_flow);
 	}
-	else{
+	else {
 		Node * leaf = (*input.nodes.begin());
 		cout << "This is leaf: " << leaf->label << endl;
 		cout << "Congrajulation!" << endl;
@@ -503,4 +503,17 @@ int make_cluster(tree * root, double cut_off){
 		make_cluster(root->r_tree,cut_off);
 	}
 	return 0;
+}
+
+int tree_reconstruct(tree * root, int option){
+	if (option == 0){
+		//
+
+		return 0;
+	}
+	else if (option == 1){
+		//
+
+		return 0;
+	}
 }

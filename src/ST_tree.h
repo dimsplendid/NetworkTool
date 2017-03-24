@@ -1,4 +1,5 @@
 #pragma once
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "Graph.h"
@@ -24,3 +25,5 @@ typedef struct st_tree tree;
 tree * insertnode();
 void tree_printf(tree *);
 int tree_cluster(tree *);
+
+void tree_printf2file( const char * filename, tree * root);

@@ -1,8 +1,11 @@
 #include "ST_tree.h"
 link_lst * creat_node(int data){
 	// dynamic allocate memory
+
+  /*
   printf("creat node...\n");
   printf("data is: %d\n",data);
+  */
 
 	link_lst * n = (link_lst*)malloc(sizeof(link_lst));
 	n->data = data;
@@ -40,6 +43,16 @@ void link_lst_fprintf(const char * filename, link_lst * lst){
     fprintf(f, "\n");
     fclose(f);
   }
+}
+
+int link_lst_len(link_lst * lst){
+  int l = 0;
+  link_lst * n = lst;
+  while (n != NULL){
+    l++;
+    n = n->next;
+  }
+  return l;
 }
 
 void add_member(link_lst * lst, int data){
@@ -107,14 +120,14 @@ void tree_get_member(tree * root, link_lst * members){
   if (root != NULL){
     if ((root->l_tree == NULL) && (root->r_tree == NULL)){
       if(n->data == -1){
-        printf("set n->data = member\n" );
+        // printf("set n->data = member\n" );
         n->data = root->members[0];
       }
       else{
-        printf("call add_member()\n" );
+        // printf("call add_member()\n" );
         add_member(n,root->members[0]);
       }
-      printf("%d ",root->members[0]);
+      // printf("%d ",root->members[0]);
     }
     else{
       tree_get_member(root->l_tree,n);
@@ -123,21 +136,139 @@ void tree_get_member(tree * root, link_lst * members){
   }
 }
 
+// set a subtree format
+void subtree_fprintf(const char * file, link_lst * subtree[3],tree * root){
+  FILE * f = fopen(file,"a");
+  link_lst * root_lst = subtree[0];
+  link_lst * lt_lst = subtree[1];
+  link_lst * rt_lst = subtree[2];
+  link_lst * n = NULL;
+  if (f == NULL){ perror("Error opening file!\n"); }
+  else{
+    if (link_lst_len(root_lst) > 3){
+      fprintf(f, "\t\"C%d\"", root->id);
+      fprintf(f, "[comment=\"");
+      n = root_lst;
+      while (n != NULL) {
+        fprintf(f, "%d",n->data );
+        n = n->next;
+      }
+      fprintf(f, "\"];\n");
+    }
+    else{
+      n = root_lst;
+      fprintf(f, "\t\"");
+      while (n != NULL) {
+        fprintf (f, "%d ",n->data);
+        n = n->next;
+      }
+      fprintf(f, "\"\n");
+    }
+    if((root->r_tree != NULL) && (root->l_tree != NULL)){
+      if (link_lst_len(lt_lst) > 3){
+        fprintf(f,"\t\"C%d\" -> ", root->l_tree->id);
+      }
+      else{
+        n = lt_lst;
+        fprintf(f, "\t\"");
+        while (n != NULL) {
+          fprintf (f, "%d ",n->data);
+          n = n->next;
+        }
+        fprintf(f, "\" -> ");
+      }
+
+      if (link_lst_len(rt_lst) > 3){
+        fprintf(f,"\t\"C%d\"", root->r_tree->id);
+      }
+      else{
+        n = rt_lst;
+        fprintf(f, "\t\"");
+        while (n != NULL) {
+          fprintf (f, "%d ",n->data);
+          n = n->next;
+        }
+        fprintf(f, "\"");
+      }
+      fprintf(f, "[constraint=\"false\",");
+      fprintf(f, " style=\"bold\",");
+      fprintf(f, " label=\"%.2f\"];\n", root->max_flw );
+
+      if (link_lst_len(root_lst) > 3){
+        fprintf(f, "\t\"C%d\" -> ", root->id);
+      }
+      else{
+        n = root_lst;
+        fprintf(f, "\t\"");
+        while (n != NULL) {
+          fprintf (f, "%d ",n->data);
+          n = n->next;
+        }
+        fprintf(f, "\" -> ");
+      }
+      if (link_lst_len(lt_lst) > 3){
+        fprintf(f,"\t\"C%d\"", root->l_tree->id);
+      }
+      else{
+        n = lt_lst;
+        fprintf(f, "\t\"");
+        while (n != NULL) {
+          fprintf (f, "%d ",n->data);
+          n = n->next;
+        }
+        fprintf(f, "\"");
+      }
+      fprintf(f, "[dir=\"none\", style=\"dashed\"];\n");
+      if (link_lst_len(root_lst) > 3){
+        fprintf(f, "\t\"C%d\" -> ", root->id);
+      }
+      else{
+        n = root_lst;
+        fprintf(f, "\t\"");
+        while (n != NULL) {
+          fprintf (f, "%d ",n->data);
+          n = n->next;
+        }
+        fprintf(f, "\" -> ");
+      }
+      if (link_lst_len(rt_lst) > 3){
+        fprintf(f,"\t\"C%d\"", root->r_tree->id);
+      }
+      else{
+        n = rt_lst;
+        fprintf(f, "\t\"");
+        while (n != NULL) {
+          fprintf (f, "%d ",n->data);
+          n = n->next;
+        }
+        fprintf(f, "\"");
+      }
+      fprintf(f, "[dir=\"none\", style=\"dashed\"];\n");
+    }
+    fclose(f);
+  }
+}
+
 void tree_fprintf( const char * filename, tree * root){
   if(root != NULL) {
-    link_lst * root_members = creat_node(-1);
-    // link_lst * lt_members = NULL;
-    // link_lst * rt_members = NULL;
 
-    tree_get_member(root, root_members);
-    link_lst_fprintf(filename,root_members);
-    link_lst_printf(root_members);
+    link_lst * subtree[3];
+    for(int i = 0; i < 3; i++){
+      subtree[i] = creat_node(-1);
+    }
 
-    free_link_lst(root_members);
+    tree_get_member(root, subtree[0]);
+    tree_get_member(root->l_tree, subtree[1]);
+    tree_get_member(root->r_tree, subtree[2]);
+
+    subtree_fprintf(filename,subtree,root);
+
+    for(int i = 0; i < 3; i++){
+      free_link_lst(subtree[i]);
+    }
 
     tree_fprintf(filename, root->l_tree);
     tree_fprintf(filename, root->r_tree);
-
   }
 }
 
@@ -147,7 +278,6 @@ void tree_printf2file( const char * filename, tree * root){
   else {fclose(f);}
 
   f = fopen(filename,"a");
-  if (f == NULL) { perror("Error opening file!\n"); }
 
   FILE * tmp1 = fopen("Tree_first.dot","r");
   char sentence[256] ;
@@ -161,6 +291,10 @@ void tree_printf2file( const char * filename, tree * root){
   fclose(f);
 
   tree_fprintf(filename,root);
+
+  f = fopen(filename,"a");
+  fprintf(f, "}\n");
+  fclose(f);
 
 }
 #ifdef MAIN
@@ -181,6 +315,11 @@ int main(){
   // tree_printf(root);
   const char * filename = "mT.dot";
   tree_printf2file(filename,root);
+  /*
+  link_lst * root_members = creat_node(-1);
+  tree_get_member(root,root_members);
+  printf("length of root members: %d\n",link_lst_len(root_members));
+  */
 
   return 0;
 }
