@@ -3,6 +3,7 @@
 #include "aux.h"
 #include "Graph.h"
 #include "ST_tree.h"
+#include <math.h>
 
 bool findPath(Graph& graph,vector<int> & path,int &,int&);
 double FordFulkerson(Graph&, Graph&,int &, int &,Graph &, Graph &);

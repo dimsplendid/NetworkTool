@@ -86,21 +86,22 @@ int main(int argc, char * argv[]){
 
 		input.id = 0;
 		st_iteration(input,root);
-		tree_printf(root);
+		// tree_printf(root);
 		make_cluster(root,cluster_cut_off);
 		tree_out.open(tree_log_name.c_str(),ios::app);
-		//tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
+		// tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
 		tree_out << "}" << endl;
-		//tree_nrm_out << "}" << endl;
+		// tree_nrm_out << "}" << endl;
 		tree_out.close();
-		//tree_nrm_out.close();
+		// tree_nrm_out.close();
 		system("dot -Tpng Tree.dot -o Tree.png");
 
 		//another output for modified tree
-
+		tree_reconstruct(root,0);
 		const char * filename = "mTree.dot";
 		tree_printf2file(filename,root);
 		system("dot -Tpng mTree.dot -o mTree.png");
+		free_tree(root);
 	}
 	else if((strcmp(argv[1],"-f") == 0)){
 		int S,T;

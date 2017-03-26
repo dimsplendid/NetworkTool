@@ -1,5 +1,6 @@
 // network analysis tool
 #include "tool.h"
+double INF = 1.0/0.0;
 int tree_id = 0;
 struct descending_cmp{
 	bool operator() (int i,int j) {return (i>j);}
@@ -370,9 +371,11 @@ int st_iteration(Graph & input, tree * root) {
 	  lt->par = root;
 		lt->rank = root->rank + 1;
 		lt->id = s_group.id;
+		lt->max_flw = INF;
 	  rt->par = root;
 		rt->rank = root->rank + 1;
 		rt->id = t_group.id;
+		rt->max_flw = INF;
 
 		st_iteration(s_group,lt);
 		st_iteration(t_group,rt);
@@ -503,17 +506,4 @@ int make_cluster(tree * root, double cut_off){
 		make_cluster(root->r_tree,cut_off);
 	}
 	return 0;
-}
-
-int tree_reconstruct(tree * root, int option){
-	if (option == 0){
-		//
-
-		return 0;
-	}
-	else if (option == 1){
-		//
-
-		return 0;
-	}
 }

@@ -113,19 +113,27 @@ void tree_printf(tree * root){
     tree_printf(root->r_tree);
   }
 }
-
+void free_tree(tree * root) {
+    if (root->l_tree != NULL) {
+        free_tree(root->l_tree);
+    }
+    if (root->r_tree != NULL) {
+        free_tree(root->r_tree);
+    }
+    free(root);
+}
 // print tree to file
 void tree_get_member(tree * root, link_lst * members){
   link_lst * n = members;
   if (root != NULL){
     if ((root->l_tree == NULL) && (root->r_tree == NULL)){
       if(n->data == -1){
-        // printf("set n->data = member\n" );
-        n->data = root->members[0];
+        // n->data = root->members[0];
+        n->data = root->members[0]+1; // +1 for real label
       }
       else{
-        // printf("call add_member()\n" );
-        add_member(n,root->members[0]);
+        // add_member(n,root->members[0]);
+        add_member(n,root->members[0]+1); // +1 for real label
       }
       // printf("%d ",root->members[0]);
     }
@@ -150,7 +158,7 @@ void subtree_fprintf(const char * file, link_lst * subtree[3],tree * root){
       fprintf(f, "[comment=\"");
       n = root_lst;
       while (n != NULL) {
-        fprintf(f, "%d",n->data );
+        fprintf(f, "%d ",n->data );
         n = n->next;
       }
       fprintf(f, "\"];\n");
@@ -295,8 +303,56 @@ void tree_printf2file( const char * filename, tree * root){
   f = fopen(filename,"a");
   fprintf(f, "}\n");
   fclose(f);
-
 }
+
+void tree_reconstruct_0(tree * root){
+  if((root->l_tree != NULL) && (root->r_tree != NULL)){
+    tree * lt = root->l_tree;
+    tree * rt = root->r_tree;
+    tree_reconstruct_0(root->l_tree);
+    tree_reconstruct_0(root->r_tree);
+    while ((root->max_flw > lt->max_flw) || root->max_flw > rt->max_flw) {
+      if (rt->max_flw > lt->max_flw) {
+
+        double tmp = root->max_flw;
+        tree * tmp_tr = rt;
+        root->max_flw = lt->max_flw;
+        root->r_tree = lt->r_tree;
+        root->r_tree->par = root;
+        lt->max_flw = tmp;
+        lt->r_tree = tmp_tr;
+        lt->r_tree->par = lt;
+      }
+      else{
+        double tmp = root->max_flw;
+        tree * tmp_tr = lt;
+        root->max_flw = rt->max_flw;
+        root->l_tree = rt->l_tree;
+        root->l_tree->par = root;
+        rt->max_flw = tmp;
+        rt->l_tree = tmp_tr;
+        rt->l_tree->par = rt;
+      }
+      tree_reconstruct_0(root->l_tree);
+      tree_reconstruct_0(root->r_tree);
+    }
+  }
+}
+
+
+void tree_reconstruct(tree * root, int option){
+    if(root != NULL){
+      switch (option) {
+        case 0:
+          tree_reconstruct_0(root);
+          break;
+
+        default:
+          printf("option %d hasn't been implement!",option);
+      }
+    }
+}
+
 #ifdef MAIN
 int main(){
   tree * root = insertnode();

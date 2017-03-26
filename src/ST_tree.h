@@ -25,5 +25,7 @@ typedef struct st_tree tree;
 tree * insertnode();
 void tree_printf(tree *);
 int tree_cluster(tree *);
+void free_tree(tree *);
 
+void tree_reconstruct(tree * root, int option);
 void tree_printf2file( const char * filename, tree * root);
