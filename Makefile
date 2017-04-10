@@ -1,5 +1,5 @@
 # CC and CFLAGS are varilables
-CC = g++
+CC = g++ -g
 CFLAGS = -c
 AR = ar
 ARFLAGS = rcv

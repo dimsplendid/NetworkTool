@@ -96,6 +96,13 @@ int main(int argc, char * argv[]){
 		// tree_nrm_out.close();
 		system("dot -Tpng Tree.dot -o Tree.png");
 
+		// normalized tree
+
+		root->norm(root);
+		const char * filename_1 = "norm_tree.dot";
+		tree_printf2file(filename_1,root);
+		system("dot -Tpng norm_tree.dot -o norm_tree.png");
+
 		//another output for modified tree
 		tree_reconstruct(root,0);
 		const char * filename = "mTree.dot";

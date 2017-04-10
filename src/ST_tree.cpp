@@ -1,15 +1,58 @@
 #include "ST_tree.h"
-link_lst * creat_node(int data){
-	// dynamic allocate memory
 
-  /*
-  printf("creat node...\n");
-  printf("data is: %d\n",data);
-  */
+void tree_get_member(tree * root, link_lst * members);
+void tree_printf(tree * root);
+
+static void lst_del_impl(link_lst ** self,int data){
+  link_lst * curr = (*self),
+           * prev = NULL;
+
+  while (curr != NULL && curr->data != data) {
+    prev = curr;
+    curr = curr->next;
+  }
+
+  if(curr == 0){
+    printf("no %d in the list\n", data);
+  }
+  else if (curr == (*self)) {
+    (*self) = (*self)->next;
+    free(curr);
+    curr = NULL;
+  }
+  else {
+    prev->next = curr->next;
+    free(curr);
+    curr = NULL;
+  }
+}
+static void lst_push_impl(link_lst * self,int data){
+  // the same with add_member()
+  // need to removing the redundant once
+  link_lst * curr = self;
+  while (curr->next != NULL){
+    curr = curr->next;
+  }
+  link_lst * new_member = init_lst(data);
+  curr->next = new_member;
+}
+
+static void lst_free_impl(link_lst * self) {
+    if (self->next != NULL) {
+        lst_free_impl(self->next);
+    }
+    free(self);
+}
+
+link_lst * init_lst(int data){
+	// dynamic allocate memory
 
 	link_lst * n = (link_lst*)malloc(sizeof(link_lst));
 	n->data = data;
   n->next = NULL;
+  n->del = lst_del_impl;
+  n->push = lst_push_impl;
+  n->free = lst_free_impl;
   return n;
 }
 
@@ -60,7 +103,7 @@ void add_member(link_lst * lst, int data){
   while (now->next != NULL){
     now = now->next;
   }
-  link_lst * new_member = creat_node(data);
+  link_lst * new_member = init_lst(data);
   now->next = new_member;
 }
 
@@ -69,6 +112,41 @@ void free_link_lst(link_lst * lst) {
         free_link_lst(lst->next);
     }
     free(lst);
+}
+
+static void tree_norm_impl(tree * self){
+  if ((self->l_tree != NULL) && (self->r_tree != NULL)) {
+    int n1,n2;
+    link_lst * lst1 = init_lst(-1);
+    link_lst * lst2 = init_lst(-1);
+    tree_get_member(self->l_tree,lst1);
+    tree_get_member(self->r_tree,lst2);
+    n1 = link_lst_len(lst1);
+    n2 = link_lst_len(lst2);
+    self->max_flw = self->max_flw/double(n1)/double(n2);
+    tree_norm_impl(self->l_tree);
+    tree_norm_impl(self->r_tree);
+    free_link_lst(lst1);
+    free_link_lst(lst2);
+  }
+}
+
+static tree * tree_find_impl(tree * self,double data){
+	if(self != NULL){
+  	if (self->max_flw == data){
+    	return self;
+  	}
+  	else{
+			tree * foundSubTree = tree_find_impl(self->l_tree,data);	
+   		if(foundSubTree == NULL){
+				foundSubTree = tree_find_impl(self->r_tree,data);
+			}
+			return foundSubTree;
+ 		}
+	}
+	else{
+		return NULL;
+	}
 }
 
 tree * insertnode(){
@@ -83,7 +161,12 @@ tree * insertnode(){
   newnode->r_tree = NULL;
   newnode->max_flw = 0.0;
   newnode->size=0;
-  // newnode->members_modified = creat_node(0);
+  // methods
+  newnode->norm = tree_norm_impl;
+  newnode->find = tree_find_impl;
+  newnode->print = tree_printf;
+  // newnode->sort_data = tree_sort_data_impl;
+  // newnode->members_modified = init_lst(0);
   return newnode;
 }
 
@@ -262,7 +345,7 @@ void tree_fprintf( const char * filename, tree * root){
 
     link_lst * subtree[3];
     for(int i = 0; i < 3; i++){
-      subtree[i] = creat_node(-1);
+      subtree[i] = init_lst(-1);
     }
 
     tree_get_member(root, subtree[0]);
@@ -364,18 +447,14 @@ int main(){
   root->l_tree = lt;
   root->r_tree = rt;
   lt->par = root;
+	lt->rank = 1;
   rt->par = root;
+	rt->rank = 1;
   lt->members[0]=1;
   rt->members[0]=2;
 
-  // tree_printf(root);
-  const char * filename = "mT.dot";
-  tree_printf2file(filename,root);
-  /*
-  link_lst * root_members = creat_node(-1);
-  tree_get_member(root,root_members);
-  printf("length of root members: %d\n",link_lst_len(root_members));
-  */
+  tree * n = root->find(root,1.0);
+  n->print(n);
 
   return 0;
 }
