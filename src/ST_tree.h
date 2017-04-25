@@ -7,11 +7,15 @@
 // Link list to store the member of clusters
 typedef struct ns{
     int data;
+		double fdata;
     struct ns* next;
     struct ps* pre;
     // methods
+		int (*len) (struct ns *);
+		void (*print)(struct ns *);
     void (*del)(struct ns ** self,int data);
     void (*push)(struct ns * self,int data);
+		void (*sort)(struct ns ** self,int option);
     void (*free)(struct ns * self);
 } link_lst;
 link_lst * init_lst(int);
@@ -24,11 +28,13 @@ struct st_tree {
 	struct st_tree * l_tree;
 	struct st_tree * r_tree;
 	double max_flw;
-	int members[100];
-	int size;
-  void (*norm)( struct st_tree * self);
+	int members[1];
+
+	int (*size) ( tree * self);
+  void (*norm)( tree * self);
   tree * (*find)(tree * self,double data);
   void (*print)(tree * self);
+	void (*free)(tree * self);
   // link_lst * (*sort_data) (tree * self);
 };
 
@@ -42,10 +48,11 @@ void tree_printf2file( const char * filename, tree * root);
 
 typedef struct cluster_struct cluster;
 struct cluster_struct{
-  link_lst * total;
   link_lst * member;
-
-  void (*print)(cluster * self);
+	cluster * next;
+	
+	void (*push)(cluster * self, link_lst * new_cluster);
+  void (*print)(cluster * self,int num);
   void (*free)(cluster * self);
 };
 
