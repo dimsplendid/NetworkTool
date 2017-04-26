@@ -33,6 +33,7 @@ struct st_tree {
 	int (*size) ( tree * self);
   void (*norm)( tree * self);
   tree * (*find)(tree * self,double data);
+  int (*cluster)(tree * self);
   void (*print)(tree * self);
 	void (*free)(tree * self);
   // link_lst * (*sort_data) (tree * self);
@@ -50,10 +51,10 @@ typedef struct cluster_struct cluster;
 struct cluster_struct{
   link_lst * member;
 	cluster * next;
-	
+
 	void (*push)(cluster * self, link_lst * new_cluster);
   void (*print)(cluster * self,int num);
   void (*free)(cluster * self);
 };
 
-cluster * init_cluster ();
+cluster * cluster_init ();

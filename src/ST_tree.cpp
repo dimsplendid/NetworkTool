@@ -23,7 +23,7 @@ static link_lst * merge(link_lst * l1, link_lst * l2){
 			l2 = l2->next;
 		}
 	}
-	
+
 	if(l1){tmp->next = l1;}
 	if(l2){tmp->next = l2;}
 
@@ -221,7 +221,7 @@ static tree * tree_find_impl(tree * self,double data){
     	return self;
   	}
   	else{
-			tree * foundSubTree = tree_find_impl(self->l_tree,data);	
+			tree * foundSubTree = tree_find_impl(self->l_tree,data);
    		if(foundSubTree == NULL){
 				foundSubTree = tree_find_impl(self->r_tree,data);
 			}
@@ -234,6 +234,7 @@ static tree * tree_find_impl(tree * self,double data){
 }
 
 int tree_size_impl(tree * self);
+static int tree_cluster_impl(tree * self);
 
 tree * insertnode(){
   // initialized the node of tree
@@ -247,20 +248,49 @@ tree * insertnode(){
   newnode->l_tree = NULL;
   newnode->r_tree = NULL;
   newnode->max_flw = 1.0/0.0;
-  
+
   // methods
 	newnode->size = tree_size_impl;
   newnode->norm = tree_norm_impl;
   newnode->find = tree_find_impl;
+	newnode->cluster = tree_cluster_impl;
   newnode->print = tree_printf;
 	newnode->free = free_tree;
   // newnode->sort_data = tree_sort_data_impl;
   // newnode->members_modified = init_lst(0);
   return newnode;
 }
+static int get_max_flow(tree * root,double result[]);
 
-int tree_cluster(tree * root){
-  return 0;
+static int tree_cluster_impl(tree * self){
+	int size = self->size(self);
+	double max_flw_acc[size-1];
+	get_max_flow(self,max_flw_acc);
+
+	for(int cluster_num = 2; cluster_num <= size; cluster_num++){
+		cluster * G = cluster_init();
+		link_lst * l = init_lst(1);
+		for (int i = 2; i <= size; i++) {
+			l->push(l,i);
+		}
+
+		G->member = l;
+		for(int i = 0; i < (cluster_num-1); i++){
+			tree * tmpT = self->find(self,max_flw_acc[i]);
+			if (tmpT->l_tree->size(tmpT->l_tree) >= tmpT->r_tree->size(tmpT->r_tree)){
+				tmpT = tmpT->r_tree;
+			}
+			else{
+				tmpT = tmpT->l_tree;
+			}
+			link_lst * nl = init_lst(-1);
+			tree_get_member(tmpT, nl);
+			G->push(G,nl);
+		}
+		G->print(G,cluster_num);
+		G->free(G);
+	}
+	return 0;
 }
 // print tree on terminal
 void print_member(tree * root){
@@ -612,8 +642,8 @@ static void cluster_free_impl(cluster * self){
 	free(self->member);
 	free(self);
 }
-	
-void get_tree_value(tree * root,link_lst * l){
+
+static void get_tree_value(tree * root,link_lst * l){
 	if(root->l_tree && root->r_tree){
 		link_lst * n = init_lst(-1);
 		n->fdata = root->max_flw;
@@ -624,7 +654,7 @@ void get_tree_value(tree * root,link_lst * l){
 	}
 }
 
-int get_max_flow(tree * root,double result[]){
+static int get_max_flow(tree * root,double result[]){
 	link_lst * pseudo_head = init_lst(-1);
 	get_tree_value(root,pseudo_head);
 	link_lst * tmp = pseudo_head;
@@ -659,13 +689,13 @@ int main(void){
 
 #ifdef MAIN
 int main(int argc, char * argv[]){
-	// LHCII 
+	// LHCII
 	// made by hand XDDD
 	int size = 27;
   tree * t[size];
 	double max_flw[size] = {0.77, 100, 1.40, 0.65, 0.10,
 	                      1.84, 100, 1.04, 10.49, 3.24,
-												100, 100, 100, 100, 10.34, 0.86, 
+												100, 100, 100, 100, 10.34, 0.86,
 												100, 100, 100, 0.90, 100, 2.88,
 												100, 100, 2.65, 100, 100};
 
@@ -715,10 +745,10 @@ int main(int argc, char * argv[]){
 	t[24]->r_tree = t[26];
 	t[25]->members[0] = 12;
 	t[26]->members[0] = 11;
-	
+
 	// const char * filename = "LHCII_MON.dot";
 	// tree_printf2file(filename,t[0]);
-	
+
 	// Elimination method
 	double max_flw_acc[] = {0.1, 0.65, 0.77, 0.86, 0.90, 1.04, 1.4,
 	                     1.84, 2.65, 2.88, 3.24, 10.34, 10.49};
@@ -730,7 +760,7 @@ int main(int argc, char * argv[]){
 	for(int cluster_num = 2; cluster_num <= 14;cluster_num++){
 		cluster * G = cluster_init();
 		link_lst * member = init_lst(1);
-	
+
 		for(int i = 2; i <= 14; i++){
 			member->push(member,i);
 		}
@@ -739,11 +769,11 @@ int main(int argc, char * argv[]){
 			tree * tmpT = t[0]->find(t[0],max_flw_acc[i]);
 			if (tmpT->l_tree->size(tmpT->l_tree) >= tmpT->r_tree->size(tmpT->r_tree)){
 				tmpT = tmpT->r_tree;
-			}	
+			}
 			else{
 				tmpT = tmpT->l_tree;
 			}
-		
+
 			link_lst * nl = init_lst(-1);
 			tree_get_member(tmpT, nl);
 			G->push(G,nl);
@@ -751,16 +781,18 @@ int main(int argc, char * argv[]){
 		G->print(G,cluster_num);
 		G->free(G);
 	}
-	
+
 	printf("Normalized tree: \n");
 	t[0]->norm(t[0]);
+	t[0]->cluster(t[0]);
+	/*
 	double norm_max_flw_acc[13];
 	get_max_flow(t[0],norm_max_flw_acc);
-	
+
 	for(int cluster_num = 2; cluster_num <= 14;cluster_num++){
 		cluster * G = cluster_init();
 		link_lst * member = init_lst(1);
-	
+
 		for(int i = 2; i <= 14; i++){
 			member->push(member,i);
 		}
@@ -769,11 +801,11 @@ int main(int argc, char * argv[]){
 			tree * tmpT = t[0]->find(t[0],norm_max_flw_acc[i]);
 			if (tmpT->l_tree->size(tmpT->l_tree) >= tmpT->r_tree->size(tmpT->r_tree)){
 				tmpT = tmpT->r_tree;
-			}	
+			}
 			else{
 				tmpT = tmpT->l_tree;
 			}
-		
+
 			link_lst * nl = init_lst(-1);
 			tree_get_member(tmpT, nl);
 			G->push(G,nl);
@@ -781,10 +813,10 @@ int main(int argc, char * argv[]){
 		G->print(G,cluster_num);
 		G->free(G);
 	}
-
+	*/
 
 	t[0]->free(t[0]);
-	
+
   return 0;
 }
 #endif

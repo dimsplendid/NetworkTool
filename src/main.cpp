@@ -64,51 +64,45 @@ int main(int argc, char * argv[]){
 	}
 	input.outputFormatFile();
 	if((strcmp(argv[1],"-t") == 0)){
-		system("mv Tree.dot Old_tree.dot");
-		system("mv Tree.png Old_tree.png");
-		fstream tree_out, tree_nrm_out; // log file
-		string tree_log_name = "Tree.dot";
+		system("mv tree.dot Old_tree.dot");
+		system("mv tree.png Old_tree.png");
+		system("mv norm_tree.dot Old_norm_tree.dot");
+		system("mv norm_tree.png Old_norm_tree.png");
 		tree * root = insertnode();
-		//string tree_nrm_name = "Tree_nrm.dot";
-		tree_out.open(tree_log_name.c_str(),ios::app);
-		//tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
-		tree_out << "digraph Network{" << endl;
-		tree_out << "edge [comment=\"Wildcard node added automatic in EG.\"];"<< endl;
-    tree_out << "node [comment=\"Wildcard node added automatic in EG.\", "<< endl;
-    tree_out << "      fontname=\"sans-serif\"," << endl;
-    tree_out << "      fontsize=\"16\", " << endl;
-    tree_out << "      penwidth=\"1.5\"];" << endl;
-		//tree_nrm_out << "digraph Network{" << endl;
-		tree_out.close();
-		//tree_nrm_out.close();
 
 		cout << "Start to built st cut..." << endl;
 
 		input.id = 0;
 		st_iteration(input,root);
-		// tree_printf(root);
-		make_cluster(root,cluster_cut_off);
-		tree_out.open(tree_log_name.c_str(),ios::app);
-		// tree_nrm_out.open(tree_nrm_name.c_str(),ios::app);
-		tree_out << "}" << endl;
-		// tree_nrm_out << "}" << endl;
-		tree_out.close();
-		// tree_nrm_out.close();
-		system("dot -Tpng Tree.dot -o Tree.png");
+
+		// make_cluster(root,cluster_cut_off); NEED FIX
+
+		const char * filename_0 = "tree.dot";
+		tree_printf2file(filename_0,root);
+		printf("Elimination cluster: \n");
+		root->cluster(root);
+
+		system("dot -Tpng tree.dot -o tree.png");
 
 		// normalized tree
 
 		root->norm(root);
+
+		printf("norm tree Elimination cluster\n");
+		root->cluster(root);
+
 		const char * filename_1 = "norm_tree.dot";
 		tree_printf2file(filename_1,root);
 		system("dot -Tpng norm_tree.dot -o norm_tree.png");
 
 		//another output for modified tree
+		/*
 		tree_reconstruct(root,0);
 		const char * filename = "mTree.dot";
 		tree_printf2file(filename,root);
 		system("dot -Tpng mTree.dot -o mTree.png");
-		free_tree(root);
+		*/
+		root->free(root);
 	}
 	else if((strcmp(argv[1],"-f") == 0)){
 		int S,T;

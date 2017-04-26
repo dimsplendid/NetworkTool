@@ -227,6 +227,7 @@ void FF_output(Graph & input, Graph & output,double flow, int & s, int & t,\
 		Node * u = input.getNodeById(t_cluster[i]);
 		for(int j = 0; j < t_cluster.size();j++){
 			Node * v = input.getNodeById(t_cluster[j]);
+
 			Edge * e = input.getEdgeById(u->id,v->id);
 			t_group.addEdge(u->id,v->id,e->_capacity);
 		}
@@ -332,10 +333,8 @@ int st_iteration(Graph & input, tree * root) {
 	double flow = 0.0;
 
 	cout << "st iterate [ "<< root->id << "] start..." << endl;
-	for (int i = 0; i < input.nodes.size(); i++) {
-		root->members[i]=input.nodes.at(i)->id;
-	}
-	root->size=input.nodes.size();
+	root->members[0]=input.nodes.at(0)->id+1;
+
 	if (input.nodes.size() > 1){
 		input.sortNode();
 
@@ -493,11 +492,11 @@ int st_iteration_modified(Graph & input, double pre_flow) {
 }
 
 int make_cluster(tree * root, double cut_off){
-	if((root->max_flw > cut_off) || root->size == 1){
+	if((root->max_flw > cut_off) || root->size(root) == 1){
 		printf("---------\n");
 		printf("cluster[%d]: ",root->id);
-		for(int i = 0; i < root->size; i++){
-				printf("%d ",root->members[i]+1); // correct the name, need to modified
+		for(int i = 0; i < root->size(root); i++){
+				printf("%d ",root->members[i]);
 		}
 		printf("\n");
 	}
@@ -507,5 +506,29 @@ int make_cluster(tree * root, double cut_off){
 	}
 	return 0;
 }
+#ifdef TEST_FF
+int main(void){
+	int node_num = 4;
+	Graph g = Graph("test");
+	for(int i = 0; i < node_num; i++){
+		g.addNode(i,my_itos(i));
+		g.nodes[i]->site_energy = -double(i*10);
+	}
+	double f[16] = {0.0, 0.0, 0.0, 0.0,
+		             4.0, 0.0, 2.0, 0.0,
+								 3.0, 5.0, 0.0, 0.0,
+								 0.0, 1.0, 7.0, 0.0};
+	for(int i = 0; i < node_num;i++){
+		for(int j = 0; j < node_num;j++){
+			g.addEdge(j,i,f[i*node_num+j]);
+		}
+	}
 
 
+	tree * t = insertnode();
+	st_iteration(g,t);
+
+	t->free(t);
+	return 0;
+}
+#endif
