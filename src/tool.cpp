@@ -122,8 +122,9 @@ double FordFulkerson(Graph & input, Graph & output,int & s, int & t,\
 		(*itN1)->label = input.getNodeById((*itN1)->id)->label;
 	}
 	output.sortEdge();
-	cout << "output: " << endl;
-	output.outputFormatFile();
+	// cout << "output: " << endl;
+	// output.outputFormatFile();
+
 	// initail all flow to 0
 	vector<Edge*>::iterator itE;
 	for(itE = output.edges.begin();itE != output.edges.end();itE++){
@@ -139,13 +140,14 @@ double FordFulkerson(Graph & input, Graph & output,int & s, int & t,\
 		vector<Edge*> edge_in_path;
 		double c_f;
 		// Show the path information
+		/*
 		cout << "Print PATH: ";
 		for(int i = 0;i < path.size() ; i++){
 			Node * node = output.getNodeById(path[i]);
 			cout << node->label << " ";
 		}
 		cout << endl;
-
+		*/
 		for(int i = 0;i < path.size()-1;i++){
 			Edge * edge = output.getEdgeById(path[i],path[i+1]);
 			edge_in_path.push_back(edge);
@@ -160,11 +162,11 @@ double FordFulkerson(Graph & input, Graph & output,int & s, int & t,\
 			v_u->_capacity += c_f;
 			u_v->_flow += c_f;
 		}
-		cout << endl;
+		// cout << endl;
 		// cout << "flow: " << c_f << endl;
 		flow += c_f;
 	}
-	cout << "End FF alg..." << endl;
+	// cout << "End FF alg..." << endl;
 	return flow;
 }
 
@@ -206,7 +208,7 @@ void FF_output(Graph & input, Graph & output,double flow, int & s, int & t,\
 		n->label = input.getNodeById(n->id)->label;
 		n->site_energy = input.getNodeById(n->id)->site_energy;
 	}
-	s_group.outputFormatFile();
+	// s_group.outputFormatFile();
 	s_group.sortNode();
   fout << endl;
 	fout << endl;
@@ -237,7 +239,7 @@ void FF_output(Graph & input, Graph & output,double flow, int & s, int & t,\
 		n->label = input.getNodeById(n->id)->label;
 		n->site_energy = input.getNodeById(n->id)->site_energy;
 	}
-	t_group.outputFormatFile();
+	// t_group.outputFormatFile();
 	t_group.sortNode();
 
 	fout << "Sink flow (Max Flow) is " << flow << endl;
@@ -332,7 +334,12 @@ int st_iteration(Graph & input, tree * root) {
 	double pre_flow = 0.0;
 	double flow = 0.0;
 
-	cout << "st iterate [ "<< root->id << "] start..." << endl;
+	// cout << "st iterate [ "<< root->id << "] start..." << endl;
+
+	// because the id of graph is from 0
+	// But id of tree is from 1
+	// This should be fixed
+	// at this time, +1 is just to fit the API
 	root->members[0]=input.nodes.at(0)->id+1;
 
 	if (input.nodes.size() > 1){
@@ -340,11 +347,10 @@ int st_iteration(Graph & input, tree * root) {
 
 		Node * s = (*input.nodes.begin());
 		Node * t = (*(input.nodes.end()-1));
-		cout << "           Name	 site energy " << endl;
-		cout << "Source: " << s->label << " " << s->site_energy << endl;
-		cout << "Target: " << t->label << " " << t->site_energy << endl;
+		// cout << "           Name	 site energy " << endl;
+		// cout << "Source: " << s->label << " " << s->site_energy << endl;
+		// cout << "Target: " << t->label << " " << t->site_energy << endl;
 		string t_name, s_name, output_name;
-		printf("problem?\n");
 
 		t_name = input._name + "t";
 		s_name = input._name + "s";
@@ -361,7 +367,7 @@ int st_iteration(Graph & input, tree * root) {
 		s_group.id =  tree_id;
 		tree_id++;
 		t_group.id = tree_id;
-		tree_out(input,s_group,t_group,flow);
+		// tree_out(input,s_group,t_group,flow);
 		root->max_flw = flow;
 		tree * lt = insertnode();
 		tree * rt = insertnode();
@@ -381,8 +387,8 @@ int st_iteration(Graph & input, tree * root) {
 	}
 	else{
 		Node * leaf = (*input.nodes.begin());
-		cout << "This is leaf: " << leaf->label << endl;
-		cout << "Congrajulation!" << endl;
+		// cout << "This is leaf: " << leaf->label << endl;
+		// cout << "Congrajulation!" << endl;
 	}
 
 	return 0;
@@ -467,14 +473,14 @@ int st_iteration_modified(Graph & input, double pre_flow) {
 		Graph t_group = Graph(t_name.c_str());
 
 		flow = FordFulkerson(input,output,s->id,t->id,s_group,t_group);
-		cout << "pre_flow = " << pre_flow << "\n flow = " << flow << " \n ";
+		// cout << "pre_flow = " << pre_flow << "\n flow = " << flow << " \n ";
 
 		while (flow < pre_flow && (t->id != s->id) ){
 			i++;
 			Node * t = (*(input.nodes.end()-i));
-			cout << "change target : " << t->label << "\n" ;
+			// cout << "change target : " << t->label << "\n" ;
 			flow = FordFulkerson(input,output,s->id,t->id,s_group,t_group);
-			cout << "pre_flow = " << pre_flow << "\n flow = " << flow << " \n ";
+			// cout << "pre_flow = " << pre_flow << "\n flow = " << flow << " \n ";
 		}
 		pre_flow = flow;
 
@@ -485,8 +491,8 @@ int st_iteration_modified(Graph & input, double pre_flow) {
 	}
 	else {
 		Node * leaf = (*input.nodes.begin());
-		cout << "This is leaf: " << leaf->label << endl;
-		cout << "Congrajulation!" << endl;
+		// cout << "This is leaf: " << leaf->label << endl;
+		// cout << "Congrajulation!" << endl;
 	}
 	return 0;
 }

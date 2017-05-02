@@ -62,7 +62,7 @@ int main(int argc, char * argv[]){
 			input.addEdge(j,i,capacity);
 		}
 	}
-	input.outputFormatFile();
+	// input.outputFormatFile();
 	if((strcmp(argv[1],"-t") == 0)){
 		system("mv tree.dot Old_tree.dot");
 		system("mv tree.png Old_tree.png");

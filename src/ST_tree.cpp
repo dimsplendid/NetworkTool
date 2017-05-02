@@ -1,6 +1,6 @@
 #include "ST_tree.h"
 #include <math.h>
-#define EPSILON 0.001
+#define EPSILON 0.00001
 
 void tree_get_member(tree * root, link_lst * members);
 void tree_printf(tree * root);
@@ -490,7 +490,7 @@ void tree_fprintf( const char * filename, tree * root){
 
 void tree_printf2file( const char * filename, tree * root){
   FILE * f = fopen(filename,"w");
-  if (f == NULL) { perror("Error opening file!\n"); }
+  if (f == NULL) { fprintf(stderr,"Error opening file \"%s\"!\n",filename);}
   else {fclose(f);}
 
   f = fopen(filename,"a");
