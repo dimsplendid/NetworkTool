@@ -281,7 +281,7 @@ tree * insertnode(){
 static int get_max_flow(tree * root,double result[]);
 
 static int tree_cluster_method_simple_cut(tree * self);
-static int tree_cluster_method_simple_ratio(tree * self){return 1;}
+static int tree_cluster_method_simple_ratio(tree * self);
 static int tree_cluster_method_elimination(tree * self);
 
 static int tree_cluster_impl(tree * self,int option[3]){
@@ -319,11 +319,6 @@ static int tree_cluster_method_elimination(tree * self){
 		G->member = l;
 		for(int i = 0; i < (cluster_num-1); i++){
 			tree * tmpT = self->find(self,max_flw_acc[i]);
-			/*
-			if (tmpT->l_tree->size(tmpT->l_tree) >= tmpT->r_tree->size(tmpT->r_tree)){
-				tmpT = tmpT->r_tree;
-			}
-			*/
 			if (tmpT->l_tree->max_flw <= tmpT->r_tree->max_flw){
 				tmpT = tmpT->r_tree;
 			}
@@ -332,6 +327,7 @@ static int tree_cluster_method_elimination(tree * self){
 			}
 			link_lst * nl = init_lst(-1);
 			tree_get_member(tmpT, nl);
+      G->del(G,&nl);
 			G->push(G,nl);
 		}
 		G->print(G,cluster_num);
@@ -339,26 +335,88 @@ static int tree_cluster_method_elimination(tree * self){
 	}
   return 0;
 }
+
+static int tree_cluster_simple_cut_aux(tree * root, double cut_off, cluster * G){
+  if((root->max_flw > cut_off) || root->size(root) == 1){
+    link_lst * nl = init_lst(-1);
+    tree_get_member(root,nl);
+    G->push(G,nl);
+  }
+  else{
+    tree_cluster_simple_cut_aux(root->l_tree, cut_off, G);
+    tree_cluster_simple_cut_aux(root->r_tree, cut_off, G);
+  }
+  return 0;
+}
+
 static int tree_cluster_method_simple_cut(tree * self){
   // 1. get acc cut off list
   int size = self->size(self);
 	double max_flw_acc[size-1];
 	get_max_flow(self,max_flw_acc);
+
+  for(int i = 0; i < size-1; i++){
+    cluster * G = cluster_init();
+    link_lst * l = init_lst(-1);
+    G->member = l;
+    double cut_off = max_flw_acc[i];
+    tree_cluster_simple_cut_aux(self, cut_off, G);
+    G->print(G->next,G->len(G->next));
+    G->free(G);
+  }
+  return 0;
 }
-int make_cluster(tree * root, double cut_off){
-	if((root->max_flw > cut_off) || root->size(root) == 1){
-		printf("---------\n");
-		printf("cluster[%d]: ",root->id);
-		for(int i = 0; i < root->size(root); i++){
-				printf("%d ",root->members[i]);
-		}
-		printf("\n");
-	}
-	else{
-		make_cluster(root->l_tree,cut_off);
-		make_cluster(root->r_tree,cut_off);
-	}
-	return 0;
+
+static int tree_cluster_simple_ratio_aux(tree * root, double ratio, cluster * G){
+  if(root->l_tree != NULL){
+    if(((root->l_tree->max_flw/root->max_flw) > ratio) || root->l_tree->size(root->r_tree) == 1){
+      link_lst * nl = init_lst(-1);
+      tree_get_member(root->l_tree,nl);
+      G->push(G,nl);
+    }
+    else{
+      tree_cluster_simple_ratio_aux(root->l_tree, ratio, G);
+    }
+  }
+  if(root->r_tree != NULL){
+    if(((root->r_tree->max_flw/root->max_flw) > ratio) || root->r_tree->size(root->r_tree) == 1){
+      link_lst * nl = init_lst(-1);
+      tree_get_member(root->r_tree,nl);
+      G->push(G,nl);
+   }
+    else{
+      tree_cluster_simple_ratio_aux(root->r_tree, ratio, G);
+   }
+  }
+  return 0;
+}
+
+static int tree_cluster_method_simple_ratio(tree * self){
+  // 1. get acc cut off list
+  int size = self->size(self);
+  double base = 2.0;
+	double max_flw_acc[size-1];
+  max_flw_acc[size-2] = 1.0;
+  for (int i = 1; i < size-1; i++){
+    max_flw_acc[size-2-i] = max_flw_acc[size-1-i]*base;
+  }
+  printf("data: ");
+  for (int i = 0; i < size-1; i++){
+    printf("%.2f ",max_flw_acc[i]);
+  }
+  printf("\n");
+	
+  for(int i = 0; i < size-1; i++){
+    cluster * G = cluster_init();
+    link_lst * l = init_lst(-1);
+    G->member = l;
+    double cut_off = max_flw_acc[i];
+    tree_cluster_simple_ratio_aux(self, cut_off, G);
+    
+    G->print(G->next,G->len(G->next));
+    G->free(G);
+  }
+  return 0;
 }
 
 // print tree on terminal
@@ -635,15 +693,29 @@ void tree_reconstruct(tree * root, int option){
 static void cluster_push_impl(cluster *,link_lst *);
 static void cluster_print_impl(cluster *,int);
 static void cluster_free_impl(cluster *);
+static void cluster_del_impl(cluster * self, link_lst ** data);
+static int cluster_length_impl(cluster * self);
 cluster * cluster_init(void){
 	cluster * c = (cluster*)malloc(sizeof(cluster));
 	c->member = NULL;
 	c->next = NULL;
 
+  c->len = cluster_length_impl;
+  c->del = cluster_del_impl;
 	c->push = cluster_push_impl;
 	c->print = cluster_print_impl;
 	c->free = cluster_free_impl;
 	return c;
+}
+
+static int cluster_length_impl(cluster * self){
+  cluster * curr = self;
+  int count = 1;
+  while(curr->next != NULL){
+    curr = curr->next;
+    count++;
+  }
+  return count;
 }
 
 static void cluster_del_impl(cluster * self, link_lst ** data){
@@ -674,7 +746,6 @@ static void cluster_del_impl(cluster * self, link_lst ** data){
 }
 
 static void cluster_push_impl(cluster * self, link_lst * data){
-	cluster_del_impl(self,&data);
 	cluster * curr = self;
 	if(data != NULL){
 		while(curr->next != NULL){
@@ -769,7 +840,8 @@ int main(int argc, char * argv[]){
 												100, 100, 100, 100, 10.34, 0.86,
 												100, 100, 100, 0.90, 100, 2.88,
 												100, 100, 2.65, 100, 100};
-
+  
+  
 
 	for(int i = 0; i < size; i++){
 		t[i] = insertnode();
@@ -817,78 +889,31 @@ int main(int argc, char * argv[]){
 	t[25]->members[0] = 12;
 	t[26]->members[0] = 11;
 
-	// const char * filename = "LHCII_MON.dot";
-	// tree_printf2file(filename,t[0]);
-
-	// Elimination method
-	/*double max_flw_acc[] = {0.1, 0.65, 0.77, 0.86, 0.90, 1.04, 1.4,
-	                     1.84, 2.65, 2.88, 3.24, 10.34, 10.49};
-  */
-	/*
-	double norm_max_flw_acc[] = {0.02, 0.03, 0.06, 0.09, 0.21, 0.3,
-	                     0.31, 0.65, 1.04, 1.44, 2.65, 5.24, 10.34};
-	*/
-  int opt[3] = {0,0,2};
-	printf("Original tree: \n");
+  int opt[3] = {0,0,0};
+  printf("Original tree: \n");
+  opt[0] = 0;
+  printf("Method 1. simple cut\n");
+  opt[2] = 0;
   t[0]->cluster(t[0],opt);
-  /*
-	for(int cluster_num = 2; cluster_num <= 14;cluster_num++){
-		cluster * G = cluster_init();
-		link_lst * member = init_lst(1);
-
-		for(int i = 2; i <= 14; i++){
-			member->push(member,i);
-		}
-		G->member = member;
-		for(int i = 0; i < cluster_num-1; i++){
-			tree * tmpT = t[0]->find(t[0],max_flw_acc[i]);
-			if (tmpT->l_tree->size(tmpT->l_tree) >= tmpT->r_tree->size(tmpT->r_tree)){
-				tmpT = tmpT->r_tree;
-			}
-			else{
-				tmpT = tmpT->l_tree;
-			}
-
-			link_lst * nl = init_lst(-1);
-			tree_get_member(tmpT, nl);
-			G->push(G,nl);
-		}
-		G->print(G,cluster_num);
-		G->free(G);
-	}
-  */
+  printf("Method 2. simple ratio\n");
+  opt[2] = 1;
+  t[0]->cluster(t[0],opt);
+  printf("Method 3. elimination\n");
+  opt[2] = 2;
+  t[0]->cluster(t[0],opt);
+  
+  /*-----------------------------------------*/
 	printf("Normalized tree: \n");
   opt[1] = 1;
+  printf("Method 1. simple cut\n");
+  opt[2] = 0;
   t[0]->cluster(t[0],opt);
-	/*
-	double norm_max_flw_acc[13];
-	get_max_flow(t[0],norm_max_flw_acc);
-
-	for(int cluster_num = 2; cluster_num <= 14;cluster_num++){
-		cluster * G = cluster_init();
-		link_lst * member = init_lst(1);
-
-		for(int i = 2; i <= 14; i++){
-			member->push(member,i);
-		}
-		G->member = member;
-		for(int i = 0; i < cluster_num-1; i++){
-			tree * tmpT = t[0]->find(t[0],norm_max_flw_acc[i]);
-			if (tmpT->l_tree->size(tmpT->l_tree) >= tmpT->r_tree->size(tmpT->r_tree)){
-				tmpT = tmpT->r_tree;
-			}
-			else{
-				tmpT = tmpT->l_tree;
-			}
-
-			link_lst * nl = init_lst(-1);
-			tree_get_member(tmpT, nl);
-			G->push(G,nl);
-		}
-		G->print(G,cluster_num);
-		G->free(G);
-	}
-	*/
+  printf("Method 2. simple ratio\n");
+  opt[2] = 1;
+  t[0]->cluster(t[0],opt);
+  printf("Method 3. elimination\n");
+  opt[2] = 2;
+  t[0]->cluster(t[0],opt);
 
 	t[0]->free(t[0]);
 

@@ -75,21 +75,25 @@ int main(int argc, char * argv[]){
 		input.id = 0;
 		st_iteration(input,root);
 
-		// make_cluster(root,cluster_cut_off); NEED FIX
-		
+		int opt[3] = {0};
+		printf("option:(is normalized, is reconstruct, [simple cut|simple ratio| elimination])\n");
+		for(int i=0;i<2;i++){
+			opt[0] = i;
+			for(int j=0 ; j < 2 ; j++){
+				opt[1] = j;
+				for(int k=0; k < 3; k++){
+					printf("normalized: %d, tree reconstruct: %d, method: %d\n",i,j,k);
+					opt[2]=k;
+					root->cluster(root,opt);
+					printf("\n");
+				}
+			}
+		}		
+
 		const char * filename_0 = "tree.dot";
 		tree_printf2file(filename_0,root);
-		printf("Elimination cluster: \n");
-		root->cluster(root);
-
 		system("dot -Tpng tree.dot -o tree.png");
-
-		// normalized tree
-
 		root->norm(root);
-		printf("norm tree Elimination cluster\n");
-		root->cluster(root);
-
 		const char * filename_1 = "norm_tree.dot";
 		tree_printf2file(filename_1,root);
 		system("dot -Tpng norm_tree.dot -o norm_tree.png");

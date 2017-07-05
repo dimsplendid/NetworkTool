@@ -52,6 +52,8 @@ struct cluster_struct{
   link_lst * member;
 	cluster * next;
 
+  int (*len)(cluster * self);
+  void (*del)(cluster * self, link_lst ** data);
 	void (*push)(cluster * self, link_lst * new_cluster);
   void (*print)(cluster * self,int num);
   void (*free)(cluster * self);
