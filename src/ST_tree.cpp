@@ -57,12 +57,12 @@ static link_lst * merge_sort_list(link_lst * head){
 
 static void lst_float_print_impl(link_lst * self){
 	link_lst * n = self;
-  printf("data: ");
+  printf("%% data = [ ");
   while (n != NULL) {
     printf("%f ", n->fdata);
     n = n->next;
   }
-  printf("\n");
+  printf("] \n");
 
 }
 
@@ -294,12 +294,14 @@ static int tree_cluster_impl(tree * self,int option[3]){
   tree * copy_tree = self->copy(self);
   if (reconstruct == 1) {tree_reconstruct(copy_tree,0);}
   if (normalized == 1) {copy_tree->norm(copy_tree);}
+  printf(" G_%d%d%d = {",option[0],option[1],option[2]);
   switch (method){
     case simple_cut: tree_cluster_method_simple_cut(copy_tree); break;
     case simple_ratio: tree_cluster_method_simple_ratio(copy_tree); break;
     case elimination: tree_cluster_method_elimination(copy_tree); break;
     default: printf("method out of range\n");
   }
+  printf("};\n");
   copy_tree->free(copy_tree);
 	return 0;
 }
@@ -330,7 +332,7 @@ static int tree_cluster_method_elimination(tree * self){
       G->del(G,&nl);
 			G->push(G,nl);
 		}
-		G->print(G,cluster_num);
+		G->print(G);
 		G->free(G);
 	}
   return 0;
@@ -361,7 +363,7 @@ static int tree_cluster_method_simple_cut(tree * self){
     G->member = l;
     double cut_off = max_flw_acc[i];
     tree_cluster_simple_cut_aux(self, cut_off, G);
-    G->print(G->next,G->len(G->next));
+    G->print(G->next);
     G->free(G);
   }
   return 0;
@@ -400,11 +402,11 @@ static int tree_cluster_method_simple_ratio(tree * self){
   for (int i = 1; i < size-1; i++){
     max_flw_acc[size-2-i] = max_flw_acc[size-1-i]*base;
   }
-  printf("data: ");
+  printf("%% data = [ ");
   for (int i = 0; i < size-1; i++){
     printf("%.2f ",max_flw_acc[i]);
   }
-  printf("\n");
+  printf("];\n");
 	
   for(int i = 0; i < size-1; i++){
     cluster * G = cluster_init();
@@ -413,7 +415,7 @@ static int tree_cluster_method_simple_ratio(tree * self){
     double cut_off = max_flw_acc[i];
     tree_cluster_simple_ratio_aux(self, cut_off, G);
     
-    G->print(G->next,G->len(G->next));
+    G->print(G->next);
     G->free(G);
   }
   return 0;
@@ -691,7 +693,7 @@ void tree_reconstruct(tree * root, int option){
 // cluster
 // list of list
 static void cluster_push_impl(cluster *,link_lst *);
-static void cluster_print_impl(cluster *,int);
+static void cluster_print_impl(cluster *);
 static void cluster_free_impl(cluster *);
 static void cluster_del_impl(cluster * self, link_lst ** data);
 static int cluster_length_impl(cluster * self);
@@ -765,17 +767,17 @@ static void cluster_member_print_impl(link_lst * cluster_member){
  }
  printf("] ");
 }
-static void cluster_print_impl(cluster * self,int num){
+static void cluster_print_impl(cluster * self){
 	cluster * curr = self;
-	// int index = 1;
-	printf("G%d = {",num);
+  // printf("G&02d: {",num)
+  printf("{");
 	while(curr != NULL){
 		curr->member->print = cluster_member_print_impl;// another print style
 		curr->member->print(curr->member);
 		// index++;
 		curr = curr->next;
 	}
-	printf("};\n");
+	printf("} \n");
 }
 static void cluster_free_impl(cluster * self){
 	if(self->next != NULL){

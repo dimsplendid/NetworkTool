@@ -76,19 +76,28 @@ int main(int argc, char * argv[]){
 		st_iteration(input,root);
 
 		int opt[3] = {0};
-		printf("option:(is normalized, is reconstruct, [simple cut|simple ratio| elimination])\n");
+		printf("option:(is reconstruct, is normalized, [simple cut|simple ratio| elimination])\n");
 		for(int i=0;i<2;i++){
 			opt[0] = i;
 			for(int j=0 ; j < 2 ; j++){
 				opt[1] = j;
 				for(int k=0; k < 3; k++){
-					printf("normalized: %d, tree reconstruct: %d, method: %d\n",i,j,k);
+					printf("%%  tree reconstruct: %d, normalized: %d, method: %d\n",i,j,k);
 					opt[2]=k;
 					root->cluster(root,opt);
 					printf("\n");
 				}
 			}
-		}		
+		}
+		printf("G = {");
+		for(int i=0;i<2;i++){
+			for(int j=0 ; j < 2 ; j++){
+				for(int k=0; k < 3; k++){
+					printf("G_%d%d%d ",i,j,k);
+				}
+			}
+		}
+		printf("};\n");
 
 		const char * filename_0 = "tree.dot";
 		tree_printf2file(filename_0,root);

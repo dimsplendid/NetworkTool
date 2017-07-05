@@ -55,7 +55,7 @@ struct cluster_struct{
   int (*len)(cluster * self);
   void (*del)(cluster * self, link_lst ** data);
 	void (*push)(cluster * self, link_lst * new_cluster);
-  void (*print)(cluster * self,int num);
+  void (*print)(cluster * self);
   void (*free)(cluster * self);
 };
 
