@@ -10,12 +10,15 @@ ARFLAGS = rcv
 OPTFLAGS = -O3
 DBGFLAGS = -g -D_DEBUG_ON_
 OBJECTS = main.o Graph.o aux.o generator.o bruteforce.o tool.o tree.o
+OBJECTS_PATH = main.o Graph.o aux.o generator.o bruteforce.o tool_path.o tree.o
 
 all	: bin/MinCut
 	@echo -n ""
 
 dbg : bin/min_cut_dbg
 
+bin/MinCut_path	: $(OBJECTS_PATH) lib
+			$(CC) $(OPTFLAGS) $(OBJECTS_PATH) -ltm_usage -Llib -o $@
 bin/MinCut	: $(OBJECTS) lib
 			$(CC) $(OPTFLAGS) $(OBJECTS) -ltm_usage -Llib -o $@
 main.o 	   	: src/main.cpp lib/tm_usage.h
@@ -30,6 +33,8 @@ bruteforce.o: src/bruteforce.cpp
 			$(CC) $(CFLAGS) $< -o $@
 tool.o: src/tool.cpp src/tool.h
 			$(CC) $(CFLAGS) $< -o $@
+tool_path.o: src/tool.cpp src/tool.h
+			$(CC) $(CFLAGS) -DPATH $< -o $@
 tree.o: src/ST_tree.cpp src/ST_tree.h
 			$(CC) $(CFLAGS) $< -o $@
 

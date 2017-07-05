@@ -1,8 +1,8 @@
 #ifndef _AUX_H_
 #define _AUX_H_
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "Graph.h"
 #include "generator.h"
 #include "ST_tree.h"

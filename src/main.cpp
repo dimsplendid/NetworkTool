@@ -1,9 +1,9 @@
 // 2016 09 15
 // Tseng Wei-Hsung
 // use git to make log
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include "Graph.h"
 #include "tool.h"
@@ -76,7 +76,7 @@ int main(int argc, char * argv[]){
 		st_iteration(input,root);
 
 		// make_cluster(root,cluster_cut_off); NEED FIX
-
+		
 		const char * filename_0 = "tree.dot";
 		tree_printf2file(filename_0,root);
 		printf("Elimination cluster: \n");
@@ -87,7 +87,6 @@ int main(int argc, char * argv[]){
 		// normalized tree
 
 		root->norm(root);
-
 		printf("norm tree Elimination cluster\n");
 		root->cluster(root);
 

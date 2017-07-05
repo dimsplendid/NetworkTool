@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include "Graph.h"
 
 // Link list to store the member of clusters
@@ -30,10 +30,12 @@ struct st_tree {
 	double max_flw;
 	int members[1];
 
+  tree * (*copy)(tree * self);
+
 	int (*size) ( tree * self);
   void (*norm)( tree * self);
   tree * (*find)(tree * self,double data);
-  int (*cluster)(tree * self);
+  int (*cluster)(tree * self,int option[3]);
   void (*print)(tree * self);
 	void (*free)(tree * self);
   // link_lst * (*sort_data) (tree * self);
@@ -41,8 +43,6 @@ struct st_tree {
 
 tree * insertnode();
 void tree_printf(tree *);
-int tree_cluster(tree *);
-void free_tree(tree *);
 
 void tree_reconstruct(tree * root, int option);
 void tree_printf2file( const char * filename, tree * root);

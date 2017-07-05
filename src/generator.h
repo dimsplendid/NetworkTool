@@ -1,8 +1,8 @@
 #ifndef _RANDG_H
 #define _RANDG_H
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include "Graph.h"
 #include "aux.h"

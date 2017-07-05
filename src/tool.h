@@ -3,7 +3,7 @@
 #include "aux.h"
 #include "Graph.h"
 #include "ST_tree.h"
-#include <math.h>
+#include <cmath>
 
 bool findPath(Graph& graph,vector<int> & path,int &,int&);
 double FordFulkerson(Graph&, Graph&,int &, int &,Graph &, Graph &);
@@ -17,6 +17,5 @@ void DFS_visit(Node*,Graph&,int &);
 int st_iteration(Graph &,tree * );
 int st_iteration_modified(Graph &, double);
 void tree_out(Graph & input, Graph & s, Graph & t,double flow);
-int make_cluster(tree *, double cut_off);
 
 #endif

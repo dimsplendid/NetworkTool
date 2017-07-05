@@ -21,7 +21,7 @@ vector<int> BFS_alg(Graph & graph,int & s_id){
 
 		Node * u = graph.getNodeById(u_id);
 		vector<int> u_adj = u->neighbors;
-		for (int i = 0; i < u_adj.size(); ++i){
+		for (unsigned int i = 0; i < u_adj.size(); ++i){
 			Node * v = graph.getNodeById(u_adj[i]);
 			if (v->color == -1){
 				v->color = 0;
@@ -50,8 +50,8 @@ void DFS_alg(Graph& input, Graph& output){
 	int & time = init_time; // DFS search time step
 	// Copy graph to result
 	double capacity;
-	for (int i = 0; i < input.nodes.size(); ++i){
-		for (int j = 0; j < input.nodes.size(); ++j){
+	for (unsigned int i = 0; i < input.nodes.size(); ++i){
+		for (unsigned int j = 0; j < input.nodes.size(); ++j){
 			capacity = input.getEdgeById(i,j)->_capacity;
 			output.addEdge(i,j, capacity);
 		}
@@ -89,7 +89,7 @@ void DFS_visit(Node * u,Graph& graph, int & time){
 	u->d = time;
 	u->color = 0;
 	vector<int> u_adj = u->next_nodes;
-	for (int i = 0; i < u_adj.size(); ++i){
+	for (unsigned int i = 0; i < u_adj.size(); ++i){
 		Node * v = graph.getNodeById(u_adj[i]);
 		if (v->color == -1){
 			v->prev=u;
@@ -140,15 +140,15 @@ double FordFulkerson(Graph & input, Graph & output,int & s, int & t,\
 		vector<Edge*> edge_in_path;
 		double c_f;
 		// Show the path information
-		/*
+#ifdef PATH
 		cout << "Print PATH: ";
 		for(int i = 0;i < path.size() ; i++){
 			Node * node = output.getNodeById(path[i]);
 			cout << node->label << " ";
 		}
 		cout << endl;
-		*/
-		for(int i = 0;i < path.size()-1;i++){
+#endif
+		for(unsigned int i = 0;i < path.size()-1;i++){
 			Edge * edge = output.getEdgeById(path[i],path[i+1]);
 			edge_in_path.push_back(edge);
 		}
@@ -188,15 +188,15 @@ void FF_output(Graph & input, Graph & output,double flow, int & s, int & t,\
 	Node * sorce = output.getNodeById(s);
 	fout << "By Ford Fulkerson algorithms, S cluster is: " << sorce->label;
 	fout << " " ;
-  for(int i = 0; i < s_cluster.size();i++) {
+  for(unsigned int i = 0; i < s_cluster.size();i++) {
 		Node * node = output.getNodeById(s_cluster[i]);
 		fout << node->label << " ";
 	}
 	s_cluster.push_back(sorce->id);
 
-	for(int i = 0; i < s_cluster.size();i++){
+	for(unsigned int i = 0; i < s_cluster.size();i++){
 		Node * u = input.getNodeById(s_cluster[i]);
-		for(int j = 0; j < s_cluster.size();j++){
+		for(unsigned int j = 0; j < s_cluster.size();j++){
 			Node * v = input.getNodeById(s_cluster[j]);
 			Edge * e = input.getEdgeById(u->id,v->id);
 			s_group.addEdge(u->id,v->id,e->_capacity);
@@ -219,15 +219,15 @@ void FF_output(Graph & input, Graph & output,double flow, int & s, int & t,\
 	fout << "By Ford Fulkerson algorithms, T cluster is: " << sink->label;
 	fout << " " ;
 
-  for(int i = 0; i < t_cluster.size();i++){
+  for(unsigned int i = 0; i < t_cluster.size();i++){
 		Node * node = output.getNodeById(t_cluster[i]);
 		fout << node->label << " ";
 	}
   fout << endl;
 	t_cluster.push_back(sink->id);
-	for(int i = 0; i < t_cluster.size();i++){
+	for(unsigned int i = 0; i < t_cluster.size();i++){
 		Node * u = input.getNodeById(t_cluster[i]);
-		for(int j = 0; j < t_cluster.size();j++){
+		for(unsigned int j = 0; j < t_cluster.size();j++){
 			Node * v = input.getNodeById(t_cluster[j]);
 
 			Edge * e = input.getEdgeById(u->id,v->id);
@@ -272,7 +272,7 @@ bool findPath(Graph& graph,vector<int> & path,int& s,int& t){
 //		cout << "pre node: " << pre_node->label << endl;;
 		// build OutLinks
 		vector<Edge*> OutLinks;
-		for (int i = 0; i < pre_node->next_nodes.size(); ++i){
+		for (unsigned int i = 0; i < pre_node->next_nodes.size(); ++i){
 			Node * next = graph.getNodeById(pre_node->next_nodes[i]);
 			if (next->color == -1){
 				Edge * OutLink = graph.getEdgeById(pre,next->id);
@@ -331,7 +331,7 @@ bool findPath(Graph& graph,vector<int> & path,int& s,int& t){
 
 
 int st_iteration(Graph & input, tree * root) {
-	double pre_flow = 0.0;
+	// double pre_flow = 0.0;
 	double flow = 0.0;
 
 	// cout << "st iterate [ "<< root->id << "] start..." << endl;
@@ -372,12 +372,12 @@ int st_iteration(Graph & input, tree * root) {
 		tree * lt = insertnode();
 		tree * rt = insertnode();
 		root->l_tree = lt;
-	  root->r_tree = rt;
-	  lt->par = root;
+		root->r_tree = rt;
+		lt->par = root;
 		lt->rank = root->rank + 1;
 		lt->id = s_group.id;
 		lt->max_flw = INF;
-	  rt->par = root;
+		rt->par = root;
 		rt->rank = root->rank + 1;
 		rt->id = t_group.id;
 		rt->max_flw = INF;
@@ -386,7 +386,7 @@ int st_iteration(Graph & input, tree * root) {
 		st_iteration(t_group,rt);
 	}
 	else{
-		Node * leaf = (*input.nodes.begin());
+		// Node * leaf = (*input.nodes.begin());
 		// cout << "This is leaf: " << leaf->label << endl;
 		// cout << "Congrajulation!" << endl;
 	}
@@ -403,13 +403,13 @@ void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow) {
 		root_name.append(my_itos(root.id));
 		tout << "\" " << root_name << "\"";
 		tout << "[comment=\"" ;
-		for (int i = 0; i < root.nodes.size(); i++) {
+		for (unsigned int i = 0; i < root.nodes.size(); i++) {
 			tout << root.nodes[i]->label << " ";
 		}
 		tout << "\"];" << endl;
 	}
 	else{
-		for (int i = 0; i < root.nodes.size(); i++) {
+		for (unsigned int i = 0; i < root.nodes.size(); i++) {
 			root_name.append(root.nodes[i]->label);
 			root_name.append(" ");
 		}
@@ -419,7 +419,7 @@ void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow) {
 		s_name.append(my_itos(s_group.id));
 	}
 	else{
-		for (int i = 0; i < s_group.nodes.size(); i++) {
+		for (unsigned int i = 0; i < s_group.nodes.size(); i++) {
 			s_name.append(s_group.nodes[i]->label);
 			s_name.append(" ");
 		}
@@ -429,7 +429,7 @@ void tree_out(Graph & root, Graph & s_group, Graph & t_group, double flow) {
 		t_name.append(my_itos(t_group.id));
 	}
 	else{
-		for (int i = 0; i < t_group.nodes.size(); i++) {
+		for (unsigned int i = 0; i < t_group.nodes.size(); i++) {
 			t_name.append(t_group.nodes[i]->label);
 			t_name.append(" ");
 		}
@@ -490,28 +490,14 @@ int st_iteration_modified(Graph & input, double pre_flow) {
 		st_iteration_modified(t_group,pre_flow);
 	}
 	else {
-		Node * leaf = (*input.nodes.begin());
+		// Node * leaf = (*input.nodes.begin());
 		// cout << "This is leaf: " << leaf->label << endl;
 		// cout << "Congrajulation!" << endl;
 	}
 	return 0;
 }
 
-int make_cluster(tree * root, double cut_off){
-	if((root->max_flw > cut_off) || root->size(root) == 1){
-		printf("---------\n");
-		printf("cluster[%d]: ",root->id);
-		for(int i = 0; i < root->size(root); i++){
-				printf("%d ",root->members[i]);
-		}
-		printf("\n");
-	}
-	else{
-		make_cluster(root->l_tree,cut_off);
-		make_cluster(root->r_tree,cut_off);
-	}
-	return 0;
-}
+
 #ifdef TEST_FF
 int main(void){
 	int node_num = 4;
