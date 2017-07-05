@@ -5,4 +5,7 @@
 bin/*
 input/*
 output/*
-.png
+*.png
+*.log
+*.json
+*.run
