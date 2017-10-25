@@ -6,29 +6,10 @@ DESCRIPTION
        MinCut is a tool to analysis graph, and especially
        for photosynthesis system.
 OPTIONS
-       -g file [s flow], --generator
-           Generating a matrix name <file name>.data, which
-           has s flow=[s flow], by default s flow is 2.5.
-
-  tools
-       -f file, --FordFulkerson
-           Use the Ford Fulkerson algorithms to solve the min
-           -cut problem. This function would produce 2 file,
-           file.log and file.out.
-
-       -b file, --BruteForce
-           Use the brute force ethod to check the s-t cut of
-           the graph. Because the minimum cut is the NPC
-           problem, this method can't check the large system
-           It's use to check the smaller system(maybe < 10).
-
-       -d file, --DFS
-           Use the Depth-first Search to build the DFS forest.
-
-       -t file, --BinaryTree
+       -t [file] [output name], --BinaryTree
            Use Ford Fulkerson algorithms to build the Tree.
 
-       --plot-network
+       --plot-network [file]
            Plot network diagram directily by using the program graphviz(dot)
            
   help
